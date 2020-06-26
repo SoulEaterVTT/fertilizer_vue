@@ -1,0 +1,411 @@
+//用户管理 组织机构 人员管理 岗位管理
+.manager-contain {
+  width: 100%;
+  height: 100%;
+  padding-bottom: 0;
+  background: #fff;
+  padding: 7px;
+  margin-bottom: 20px;
+
+  .head {
+    width: 100%;
+    margin: 10px auto;
+    border-bottom: none;
+    text-align: left;
+    height: 40px;
+
+    .headSelect {
+      width: 10%;
+      margin-right: 20px;
+    }
+  }
+
+  .content-header-search {
+    height: 30px;
+    float: right;
+
+    .svg-icon {
+      width: 30px;
+      height: 30px;
+    }
+
+    .header-search-select {
+      font-size: 18px;
+      transition: width 0.2s;
+      width: 0;
+      overflow: hidden;
+      background: transparent;
+      border-radius: 0;
+      display: inline-block;
+      vertical-align: middle;
+
+      /deep/ .el-input__inner {
+        border-radius: 0;
+        border: 0;
+        padding-left: 0;
+        padding-right: 0;
+        box-shadow: none !important;
+        border-bottom: 1px solid #d9d9d9;
+        vertical-align: middle;
+      }
+    }
+
+    &.show {
+      .header-search-select {
+        width: 210px;
+        margin-left: 10px;
+        margin-right: 10px;
+      }
+    }
+  }
+
+  .table-contain {
+    width: 100%;
+    margin-top: 36px;
+    min-height: calc(100vh - 145px);
+    position: relative;
+
+    .el-table thead {
+      color: #606266;
+      font-weight: 500;
+    }
+
+    .table_left {
+      width: 20%;
+      float: left;
+      margin-right: 5px;
+    }
+
+    .table_right {
+      width: 79%;
+    }
+
+    .elrow-class {
+      position: absolute;
+      right: 0;
+      bottom: 0;
+
+      .pagination {
+        margin: -10px 20px;
+        text-align: right;
+      }
+
+      .pagination1 {
+        margin: 10px 20px;
+        text-align: right;
+
+        .el-input__inner {
+          -webkit-appearance: none;
+          background-color: #fff;
+          background-image: none;
+          border-radius: 1px;
+          border: 1px solid #dcdfe6;
+          -webkit-box-sizing: border-box;
+          box-sizing: border-box;
+          color: #606266;
+          display: inline-block;
+          font-size: 14px;
+          height: 28px;
+          line-height: 40px;
+          outline: 0;
+          padding: 0 15px;
+          -webkit-transition: border-color 0.2s cubic-bezier(0.645, 0.045, 0.355, 1);
+          transition: border-color 0.2s cubic-bezier(0.645, 0.045, 0.355, 1);
+          width: 100%;
+        }
+      }
+    }
+
+    .form-container {
+      margin-top: 84px;
+      margin-left: 211px;
+
+      .form-content {
+        height: 90%;
+        padding-top: 20px;
+        margin-left: 5%;
+        margin-right: 5%;
+        margin-bottom: 5%;
+        position: relative;
+        border: 1px solid #ebebeb;
+        border-radius: 3px;
+        transition: 0.2s;
+
+        .content {
+          display: flex;
+          height: 574px;
+          overflow-y: auto;
+
+          .content-left {
+            width: 50%;
+            margin-left: 200px;
+            margin-right: 50px;
+            padding-left: 1rem;
+            padding-right: 1rem;
+            padding-top: 1rem;
+          }
+
+          .content-right {
+            width: 50%;
+            margin-left: 50px;
+            margin-right: 200px;
+            padding-left: 1rem;
+            padding-right: 1rem;
+            padding-top: 1rem;
+          }
+        }
+
+        .form-footer {
+          width: 100%;
+          height: 100px;
+          position: absolute;
+          bottom: 0;
+          border-top: 1px solid #f4f4f4;
+
+          .affirm-btn {
+            float: right;
+            width: 100px;
+            margin-top: 30px;
+            margin-right: 25px;
+          }
+
+          .cancle-btn {
+            width: 100px;
+            float: right;
+            margin-top: 30px;
+            margin-right: 200px;
+          }
+        }
+
+        .module-border {
+          border: 1px solid #dcdfe6;
+          border-left: none;
+          border-radius: 1px 3px 3px 1px;
+          height: 45px;
+        }
+
+        .el-form--label-left {
+          text-align: center;
+        }
+
+        .el-form--label-left .el-form-item__label {
+          text-align: center;
+        }
+
+        .el-form-item__label {
+          text-align: center;
+          width: 100px;
+          background-color: #f5f7fa;
+          border: 1px solid #dcdfe6;
+          border-radius: 4px 0px 0px 4px;
+          height: 45px;
+          font-size: 16px;
+          font-weight: normal;
+          padding: 2px;
+        }
+
+        .el-radio__label {
+          font-size: 16px;
+          padding-left: 10px;
+        }
+
+        .el-switch__label * {
+          line-height: 1;
+          font-size: 16px;
+          display: inline-block;
+        }
+
+        .el-input__inner {
+          -webkit-appearance: none;
+          background-color: #fff;
+          background-image: none;
+          border-radius: 0px 4px 4px 0px;
+          border: 1px solid #dcdfe6;
+          border-left: none;
+          -webkit-box-sizing: border-box;
+          box-sizing: border-box;
+          color: #606266;
+          display: inline-block;
+          font-size: 16px;
+          height: 45px;
+          line-height: 40px;
+          outline: 0;
+          -webkit-transition: border-color 0.2s cubic-bezier(0.645, 0.045, 0.355, 1);
+          transition: border-color 0.2s cubic-bezier(0.645, 0.045, 0.355, 1);
+        }
+      }
+    }
+  }
+
+  .table-contain2 {
+    width: 100%;
+    height: 100%;
+    position: relative;
+
+    .circle {
+      float: right;
+      cursor: pointer;
+
+      i {
+        font-size: 26px;
+      }
+    }
+
+    .table-contain-left {
+      width: 40%;
+      float: left;
+      margin-right: 5px;
+    }
+
+    .table-contain-right {
+      width: 59%;
+      float: right;
+    }
+
+    .elrow-class {
+      display: contents;
+
+      .pagination {
+        margin: 0 20px;
+        text-align: right;
+      }
+    }
+  }
+
+  .table-contain3 {
+    width: 100%;
+    min-height: calc(100vh - 145px);
+    position: relative;
+
+    .el-table thead {
+      color: #606266;
+      font-weight: 500;
+    }
+
+    .elrow-class {
+      position: absolute;
+      right: 0;
+      bottom: 10px;
+    }
+
+    .form-container {
+      margin-top: 84px;
+      margin-left: 211px;
+
+      .form-content {
+        height: 90%;
+        padding-top: 20px;
+        margin-left: 5%;
+        margin-right: 5%;
+        margin-bottom: 5%;
+        position: relative;
+        border: 1px solid #ebebeb;
+        border-radius: 3px;
+        transition: 0.2s;
+
+        .content {
+          display: flex;
+          height: 574px;
+          overflow-y: auto;
+
+          .content-left {
+            width: 50%;
+            margin-left: 200px;
+            margin-right: 50px;
+            padding-left: 1rem;
+            padding-right: 1rem;
+            padding-top: 1rem;
+          }
+
+          .content-right {
+            width: 50%;
+            margin-left: 50px;
+            margin-right: 200px;
+            padding-left: 1rem;
+            padding-right: 1rem;
+            padding-top: 1rem;
+          }
+        }
+
+        .form-footer {
+          width: 100%;
+          height: 100px;
+          position: absolute;
+          bottom: 0;
+          border-top: 1px solid #f4f4f4;
+
+          .affirm-btn {
+            float: right;
+            width: 100px;
+            margin-top: 30px;
+            margin-right: 25px;
+          }
+
+          .cancle-btn {
+            width: 100px;
+            float: right;
+            margin-top: 30px;
+            margin-right: 200px;
+          }
+        }
+
+        .module-border {
+          border: 1px solid #dcdfe6;
+          border-left: none;
+          border-radius: 1px 3px 3px 1px;
+          height: 45px;
+        }
+
+        .el-form--label-left {
+          text-align: center;
+        }
+
+        .el-form--label-left .el-form-item__label {
+          text-align: center;
+        }
+
+        .el-form-item__label {
+          text-align: center;
+          width: 150px;
+          background-color: #f5f7fa;
+          border: 1px solid #dcdfe6;
+          border-radius: 4px 0px 0px 4px;
+          height: 45px;
+          font-size: 16px;
+          font-weight: normal;
+          padding: 2px;
+        }
+
+        .el-radio__label {
+          font-size: 16px;
+          padding-left: 10px;
+        }
+
+        .el-switch__label * {
+          line-height: 1;
+          font-size: 16px;
+          display: inline-block;
+        }
+
+        .el-input__inner {
+          -webkit-appearance: none;
+          background-color: #fff;
+          background-image: none;
+          border-radius: 0px 4px 4px 0px;
+          border: 1px solid #dcdfe6;
+          border-left: none;
+          -webkit-box-sizing: border-box;
+          box-sizing: border-box;
+          color: #606266;
+          display: inline-block;
+          font-size: 16px;
+          height: 45px;
+          line-height: 40px;
+          outline: 0;
+          -webkit-transition: border-color 0.2s cubic-bezier(0.645, 0.045, 0.355, 1);
+          transition: border-color 0.2s cubic-bezier(0.645, 0.045, 0.355, 1);
+        }
+      }
+    }
+  }
+}

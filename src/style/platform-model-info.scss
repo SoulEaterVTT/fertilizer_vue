@@ -1,0 +1,489 @@
+.platform-model-info-class {
+    border: 1px solid #ebebeb;
+    border-radius: 3px;
+    min-height: calc(100vh - 100px);
+
+    .view-header {
+        height: 150px;
+        padding-top: 25px;
+        padding-left: 25px;
+
+        .view-header-image {
+            width: 100px;
+            float: left;
+            height: 100px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            .image {
+                max-width: 100%;
+            }
+
+        }
+
+        .view-header-text {
+            width: 90%;
+            float: right;
+            padding-left: 100px;
+            display: grid;
+
+            .text {
+                margin-top: 20px;
+                text-overflow: -o-ellipsis-lastline;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                display: -webkit-box;
+                -webkit-line-clamp: 2;
+                line-clamp: 2;
+                -webkit-box-orient: vertical;
+            }
+        }
+    }
+
+    .view-contain {
+        width: 100%;
+
+        padding-left: 20px;
+        margin-top: 50px;
+
+        .el-card__body {
+            width: 250px;
+            height: 280px;
+        }
+
+        .box-card {
+            width: 250px;
+            height: 280px;
+
+            .app-image-class {
+                text-align: center;
+            }
+
+            .app-title-class {
+                text-align: center;
+                height: 45px;
+                margin-top: 10px;
+                margin-left: 10px;
+                margin-right: 10px;
+                overflow: hidden;
+                white-space: nowrap;
+                text-overflow: ellipsis;
+            }
+
+            .text {
+                height: 45px;
+                margin-left: 10px;
+                margin-right: 10px;
+                text-overflow: -o-ellipsis-lastline;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                display: -webkit-box;
+                -webkit-line-clamp: 2;
+                line-clamp: 2;
+                -webkit-box-orient: vertical;
+            }
+
+            .app-btn-class {
+                margin-top: 5px;
+                width: 210px;
+                text-align: center;
+
+                .el-button--primary {
+                    background-color: #dcdfe6;
+                    border-color: #dcdfe6;
+                }
+
+                .el-button--primary:hover {
+                    background: #66b1ff;
+                    border-color: #66b1ff;
+                }
+
+                .el-button--danger {
+                    background-color: #dcdfe6;
+                    border-color: #dcdfe6;
+                }
+
+                .el-button--danger:hover {
+                    background: #f78989;
+                    border-color: #f78989;
+                }
+
+                .el-button--success {
+                    background-color: #dcdfe6;
+                    border-color: #dcdfe6;
+                }
+
+                .el-button--success:hover {
+                    background: #42b983;
+                    border-color: #42b983;
+                }
+            }
+
+            .app-class-add {
+                height: 239px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                text-align: justify;
+
+                .svg-icon {
+                    width: 50%;
+                    height: 50%;
+                    vertical-align: middle;
+                    fill: currentColor;
+                    overflow: hidden;
+                }
+            }
+        }
+
+        .form-content {
+            position: relative;
+            min-height: calc(100vh - 350px);
+            transition: 0.2s;
+
+            .content {
+                display: flex;
+
+                .content-left {
+                    width: 50%;
+                    margin-left: 200px;
+                    margin-right: 50px;
+                    padding-left: 1rem;
+                    padding-right: 1rem;
+                    padding-top: 1rem;
+
+                    .header {
+                        vertical-align: middle;
+                        height: 50px;
+                        float: right;
+                        line-height: 50px;
+                    }
+                }
+
+                .content-right {
+                    width: 50%;
+                    margin-left: 50px;
+                    margin-right: 200px;
+                    padding-left: 1rem;
+                    padding-right: 1rem;
+                    padding-top: 1rem;
+                }
+
+
+            }
+        }
+
+        .form-footer {
+            width: 100%;
+            height: 100px;
+            position: absolute;
+            bottom: 0;
+            border-top: 1px solid #f4f4f4;
+
+            .cancle-btn {
+                width: 100px;
+                float: right;
+                margin-top: 30px;
+                margin-right: 200px;
+            }
+
+            .affirm-btn {
+                float: right;
+                width: 100px;
+                margin-top: 30px;
+                margin-right: 200px;
+            }
+        }
+
+        .div-logo-class {
+            width: 100px;
+            height: 100px;
+            display: table-cell;
+            vertical-align: middle;
+            align-content: center;
+
+            .logo {
+                height: 100%;
+                width: 100%;
+                vertical-align: middle;
+                display: inline-block;
+            }
+        }
+
+        .applogo {
+            height: 100px;
+            width: 100px;
+            vertical-align: middle;
+            display: inline-block;
+        }
+
+        .left-label-access {
+            border: 1px solid #dcdfe6;
+            border-right: none;
+            height: 40px;
+            width: 20%;
+            height: 40px;
+            float: left;
+            line-height: 40px;
+            text-align: center;
+        }
+
+        .right-label-access {
+            border: 1px solid #dcdfe6;
+            height: 40px;
+            width: 80%;
+            height: 40px;
+            float: right;
+            line-height: 40px;
+            position: relative;
+            text-align: center;
+        }
+
+        .left-label-role {
+            border-top: 1px solid #dcdfe6;
+            border-left: 1px solid #dcdfe6;
+            border-bottom: 1px solid #dcdfe6;
+
+            width: 20%;
+            height: 120px;
+            float: left;
+            line-height: 100px;
+            text-align: center;
+        }
+
+        .right-label-role {
+            width: 80%;
+            height: 120px;
+            float: right;
+            overflow: auto;
+            line-height: 100px;
+            text-align: center;
+            border: 1px solid #dcdfe6;
+        }
+
+        .el-form-item {
+            margin-top: 22px;
+            margin-bottom: 22px;
+        }
+
+        .el-form--label-left {
+            text-align: center;
+
+        }
+
+        .el-form--label-left .el-form-item__label {
+            text-align: center;
+        }
+
+        .el-form-item__label {
+            text-align: center;
+            width: 100px;
+            background-color: #f5f7fa;
+            border: 1px solid #dcdfe6;
+            border-right: none;
+            border-radius: 1px;
+            height: 40px;
+            font-weight: normal;
+            font-size: 16px;
+        }
+
+        .el-input__inner {
+            -webkit-appearance: none;
+            background-color: #fff;
+            background-image: none;
+            border-radius: 1px;
+            border: 1px solid #dcdfe6;
+            -webkit-box-sizing: border-box;
+            box-sizing: border-box;
+            color: #606266;
+            display: inline-block;
+            font-size: 16px;
+            height: 40px;
+            line-height: 40px;
+            outline: 0;
+            padding: 0 15px;
+            -webkit-transition: border-color 0.2s cubic-bezier(0.645, 0.045, 0.355, 1);
+            transition: border-color 0.2s cubic-bezier(0.645, 0.045, 0.355, 1);
+            width: 100%;
+        }
+
+        .el-tree-node__content {
+            display: -webkit-box;
+            display: -ms-flexbox;
+            -webkit-box-align: center;
+            -ms-flex-align: center;
+            align-items: center;
+            height: 40px;
+            cursor: pointer;
+        }
+
+
+    }
+
+    .view-contain2 {
+        .card-content {
+            display: flex;
+            align-items: center;
+
+            .content {
+                float: right;
+                width: 100%;
+                height: 250px;
+                position: relative;
+
+                .title {
+                    text-align: center;
+                    line-height: 105px;
+                    font-size: 20px;
+                    position: relative;
+
+                    .logo-css {
+                        width: 100px;
+                        height: 100px;
+                        float: left;
+                        position: absolute;
+                        left: 10px;
+                        top: 10px;
+                    }
+
+                    .name {
+                        margin-left: 50%;
+                        display: block;
+                        width: 6em;
+                        word-break: keep-all;
+                        white-space: nowrap;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                    }
+                }
+
+                .discribe {
+                    margin-top: 20px;
+                    line-height: 30px;
+                    font-size: 16px;
+                    display: -webkit-box;
+                    -webkit-box-orient: vertical;
+                    overflow: hidden;
+                    -webkit-line-clamp: 2;
+                }
+
+                .footBtn {
+                    text-align: right;
+                    position: absolute;
+                    right: 0;
+                    bottom: 0;
+                }
+            }
+
+            .content1 {
+                width: 20%;
+                height: 250px;
+                position: relative;
+            }
+        }
+
+        .el-card {
+            border: 1px solid #EBEEF5;
+            background-color: #FFF;
+            color: #303133;
+            -webkit-transition: .3s;
+            transition: .3s;
+            margin-top: 20px;
+            margin-left: 20px;
+            margin-right: 20px;
+        }
+    }
+
+    .box-card2 {
+        width: 379px;
+        height: 293px;
+        margin-left: 20px;
+        margin-top: 20px;
+
+        .app-image-class {
+            text-align: center;
+        }
+
+        .app-title-class {
+            text-align: center;
+            height: 50px;
+            margin-top: 10px;
+            margin-left: 10px;
+            margin-right: 10px;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+
+        .text {
+            height: 45px;
+            margin-left: 10px;
+            margin-right: 10px;
+            text-overflow: -o-ellipsis-lastline;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            line-clamp: 2;
+            -webkit-box-orient: vertical;
+        }
+
+        .app-btn-class {
+            margin-top: 5px;
+            width: 210px;
+            text-align: center;
+
+            .el-button--primary {
+                background-color: #dcdfe6;
+                border-color: #dcdfe6;
+            }
+
+            .el-button--primary:hover {
+                background: #66b1ff;
+                border-color: #66b1ff;
+            }
+
+            .el-button--danger {
+                background-color: #dcdfe6;
+                border-color: #dcdfe6;
+            }
+
+            .el-button--danger:hover {
+                background: #f78989;
+                border-color: #f78989;
+            }
+
+            .el-button--success {
+                background-color: #dcdfe6;
+                border-color: #dcdfe6;
+            }
+
+            .el-button--success:hover {
+                background: #98ff82;
+                border-color: #98ff82;
+            }
+        }
+
+        .app-class-add {
+            height: 239px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: justify;
+
+            .svg-icon {
+                width: 50%;
+                height: 50%;
+                vertical-align: middle;
+                fill: currentColor;
+                overflow: hidden;
+            }
+        }
+    }
+
+    .module-border {
+        border: 1px solid #dcdfe6;
+        height: 40px;
+    }
+}
