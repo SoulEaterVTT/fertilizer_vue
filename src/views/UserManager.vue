@@ -1,6 +1,6 @@
 <template>
   <div class="manager-contain">
-    <div :class="{ show: show }" class="content-header-search">
+    <div class="content-header-search">
       <svg-icon
         :icon-class="add_icon_name"
         @mouseover="handleAddMouseOver"
@@ -27,6 +27,7 @@
             <div>
               <svg-icon style="color:#bfcbd9" icon-class="edit" @click="handleEdit(scope.row)" />
               <svg-icon style="color:#bfcbd9" icon-class="delete" @click="handleDelete(scope.row)" />
+              <svg-icon style="color:#bfcbd9" icon-class="detail" @click="handleDetail(scope.row)" />
             </div>
           </template>
         </el-table-column>
@@ -81,7 +82,7 @@
                 </el-form-item>
               </div>
               <div class="content-right">
-                <el-form-item prop="parent" label="负责人">
+                <el-form-item label="负责人">
                   <el-select
                     v-model="temp.parentId"
                     style="width:100%"
@@ -96,6 +97,7 @@
                     />
                   </el-select>
                 </el-form-item>
+
                 <el-form-item prop="address" label="地址">
                   <el-input v-model="temp.address" placeholder="请输入地址" />
                 </el-form-item>
@@ -113,6 +115,102 @@
           </div>
         </div>
       </el-drawer>
+
+      <el-drawer
+        ref="drawer"
+        :visible.sync="fieldDialogFormVisible"
+        direction="rtl"
+        :modal="false"
+        :show-close="false"
+        size="100%"
+        class="form-container"
+      >
+        <div class="form-content2" :style="active" @mouseover="mouseOver" @mouseleave="mouseLeave">
+          <div class="content-header-search">
+            <svg-icon
+              :icon-class="add_icon_name"
+              @mouseover="handleAddMouseOver"
+              @mouseleave="handleAddMouseLeave"
+              @click="handleCreateField"
+            />
+          </div>
+          <el-table
+            :data="fieldData"
+            border
+            stripe
+            highlight-current-row
+            style="width:100%"
+            @cell-mouse-enter="handleMouseEnter"
+            @cell-mouse-leave="handleMouseOut"
+          >
+            <el-table-column property="type" label="品种" align="center" />
+            <el-table-column property="size" label="亩数" align="center" />
+            <el-table-column property="treeAge" label="树龄" align="center" />
+            <el-table-column property="createTime" label="创建时间" align="center" />
+            <el-table-column property="updateTime" label="更新时间" align="center" />
+            <el-table-column property="remark" label="备注" align="center" />
+
+            <el-table-column label="操作" align="center">
+              <template slot-scope="scope">
+                <div>
+                  <svg-icon
+                    style="color:#bfcbd9"
+                    icon-class="edit"
+                    @click="handleUpdateField(scope.row)"
+                  />
+                  <svg-icon
+                    style="color:#bfcbd9"
+                    icon-class="delete"
+                    @click="handleDeleteField(scope.row)"
+                  />
+                </div>
+              </template>
+            </el-table-column>
+          </el-table>
+          <div slot="footer" class="form-footer">
+            <el-button class="cancle-btn" @click="fieldDialogFormVisible = false">返回</el-button>
+          </div>
+        </div>
+      </el-drawer>
+
+      <div v-if="isShowForm">
+        <el-dialog
+          :title="fielDialogStatus=='create'?'添加地块':'更新地块'"
+          :visible.sync="isShowForm"
+          width="30%"
+          :close-on-click-modal="false"
+          :before-close="closeDialog"
+        >
+          <el-form
+            ref="fieldForm"
+            :model="fieldTemp"
+            :rules="rules"
+            label-position="right"
+            label-width="100px"
+            style="margin:19px;"
+          >
+            <el-form-item prop="type" label="品种">
+              <el-input v-model="fieldTemp.type" />
+            </el-form-item>
+            <el-form-item prop="size" label="亩数">
+              <el-input v-model="fieldTemp.size" />
+            </el-form-item>
+            <el-form-item prop="treeAge" label="树龄">
+              <el-input v-model="fieldTemp.treeAge" />
+            </el-form-item>
+            <el-form-item label="备注">
+              <el-input v-model="fieldTemp.remark" type="textarea" :rows="5" placeholder="请输入内容" />
+            </el-form-item>
+          </el-form>
+          <span slot="footer" class="dialog-footer">
+            <el-button
+              type="primary"
+              @click="fielDialogStatus==='create'?createFieldData():updateFieldData()"
+            >确 定</el-button>
+            <el-button @click="closeDialog">取 消</el-button>
+          </span>
+        </el-dialog>
+      </div>
     </div>
   </div>
 </template>
@@ -125,6 +223,12 @@ import {
   updateUser,
   selectParentUser
 } from "@/api/userApi.js";
+import {
+  addField,
+  selectField,
+  deleteFieldById,
+  updateField
+} from "@/api/fieldApi.js";
 export default {
   data() {
     var checkPhone = (rule, value, callback) => {
@@ -151,16 +255,20 @@ export default {
       show: false,
       tableData: [],
       parentData: [],
-      // 需要给分页组件传的信息
+      fieldData: [],
+      isShowForm: false,
+      userId: null,
       paginations: {
-        total: 0, // 总数
-        pageIndex: 1, // 当前位于哪页
-        pageSize: 15, // 1页显示多少条
-        pageSizes: [15, 20], // 每页显示多少条
-        layout: "total, sizes, prev, pager, next, jumper" // 翻页属性
+        total: 0,
+        pageIndex: 1,
+        pageSize: 15,
+        pageSizes: [15, 20],
+        layout: "total, sizes, prev, pager, next, jumper"
       },
       dialogFormVisible: false,
+      fieldDialogFormVisible: false,
       dialogStatus: "",
+      fielDialogStatus: "",
       temp: {
         id: null,
         name: null,
@@ -171,10 +279,17 @@ export default {
         createTime: null,
         updateTime: null
       },
+      fieldTemp: {
+        id: null,
+        userId: null,
+        size: null,
+        type: null,
+        treeAge: null,
+        remark: null,
+        createTime: null,
+        updateTime: null
+      },
       rules: {
-        parent: [
-          { required: true, message: "请选择负责人", trigger: "change" }
-        ],
         name: [
           { required: true, message: "请输入用户名", trigger: "blur" },
           {
@@ -193,7 +308,18 @@ export default {
             message: "长度在 5 到 50 个字符",
             trigger: "blur"
           }
-        ]
+        ],
+        type: [
+          { required: true, message: "请输入品种", trigger: "blur" },
+          {
+            min: 2,
+            max: 50,
+            message: "长度在 2 到 50 个字符",
+            trigger: "blur"
+          }
+        ],
+        size: [{ required: true, message: "请输入亩数", trigger: "blur" }],
+        treeAge: [{ required: true, message: "请输入树龄", trigger: "blur" }]
       }
     };
   },
@@ -214,19 +340,17 @@ export default {
     this.getUserList();
   },
   methods: {
-    setAccessValue(event) {
-      this.temp.access = event;
-    },
-    setDomainValue(event) {
-      this.temp.domain = event;
-    },
     handleMouseEnter: function(row, column, cell, event) {
-      cell.children[0].children[0].children[0].style.color = "#64d9d6";
+      cell.children[0].children[0].children[0].style.color = "#70cdf1";
       cell.children[0].children[0].children[1].style.color = "#f56c6c";
+      cell.children[0].children[0].children[2].style.color = "#42b983";
+      cell.children[0].children[0].children[3].style.color = "#64d9d6";
     },
     handleMouseOut: function(row, column, cell, event) {
       cell.children[0].children[0].children[0].style.color = "#bfcbd9";
       cell.children[0].children[0].children[1].style.color = "#bfcbd9";
+      cell.children[0].children[0].children[2].style.color = "#bfcbd9";
+      cell.children[0].children[0].children[3].style.color = "#bfcbd9";
     },
     handleAddMouseOver() {
       this.add_icon_name = "add_yes";
@@ -240,18 +364,6 @@ export default {
     },
     mouseLeave() {
       this.active = "";
-    },
-    getUserListByKeyWords() {
-      if (this.searchText !== null && this.searchText !== "") {
-        selectParentUser(
-          this.paginations.pageIndex,
-          this.paginations.pageSize,
-          this.searchText
-        ).then(res => {
-          this.paginations.total = res.data.total;
-          this.tableData = res.data.list;
-        });
-      }
     },
     getUserList() {
       selectUser(
@@ -279,7 +391,7 @@ export default {
         cancelButtonText: "取消"
       })
         .then(() => {
-          deleteUserById(row.userId).then(res => {
+          deleteUserById(row.id).then(() => {
             this.$message({
               message: "删除成功",
               type: "success"
@@ -297,31 +409,29 @@ export default {
       this.temp = row;
       this.dialogStatus = "update";
       this.dialogFormVisible = true;
-      this.$nextTick(() => {
-        this.$refs["dataForm"].clearValidate();
-      });
+    },
+    handleDetail(row) {
+      this.userId = row.id;
+      this.fieldTemp.userId = row.id;
+      this.fieldDialogFormVisible = true;
+      this.getFieldList();
     },
     resetTemp() {
       this.temp = {
-        username: null,
-        userId: null,
-        platformId: null,
-        access: null,
-        bindId: null,
-        domain: null,
+        id: null,
+        name: null,
+        mobileNum: null,
+        address: null,
         password: null,
-        status: null,
-        type: null
+        parentId: null,
+        createTime: null,
+        updateTime: null
       };
     },
-
     handleCreate() {
       this.resetTemp();
       this.dialogStatus = "create";
       this.dialogFormVisible = true;
-      this.$nextTick(() => {
-        this.$refs["dataForm"].clearValidate();
-      });
     },
     createData() {
       this.$refs["dataForm"].validate(valid => {
@@ -346,16 +456,76 @@ export default {
     setParentValue(event) {
       this.temp.parentId = event;
     },
-    click() {
-      this.show = !this.show;
-      if (this.show) {
-        this.$refs.headerSearchSelect && this.$refs.headerSearchSelect.focus();
-      }
+    getFieldList() {
+      selectField(1, 15, this.fieldTemp).then(res => {
+        this.fieldData = res.data.list;
+      });
     },
-    close() {
-      this.$refs.headerSearchSelect && this.$refs.headerSearchSelect.blur();
-      this.options = [];
-      this.show = false;
+    handleCreateField() {
+      this.fielDialogStatus = "create";
+      this.isShowForm = true;
+    },
+    handleUpdateField(row) {
+      this.fieldTemp = row;
+      this.fielDialogStatus = "update";
+      this.isShowForm = true;
+    },
+    handleDeleteField(row) {
+      this.$confirm("是否确定删除此地块?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消"
+      })
+        .then(() => {
+          deleteFieldById(row.id).then(() => {
+            this.$message({
+              message: "删除成功",
+              type: "success"
+            });
+            this.getFieldList();
+          });
+        })
+        .catch(() => {
+          this.$message({
+            message: "已取消删除"
+          });
+        });
+    },
+    createFieldData() {
+      this.$refs["fieldForm"].validate(valid => {
+        if (valid) {
+          addField(this.fieldTemp).then(() => {
+            this.getFieldList();
+            this.closeDialog();
+          });
+        }
+      });
+    },
+    updateFieldData() {
+      this.$refs["fieldForm"].validate(valid => {
+        if (valid) {
+          updateField(this.fieldTemp).then(() => {
+            this.getFieldList();
+            this.closeDialog();
+          });
+        }
+      });
+    },
+    closeDialog() {
+      this.resetFieldForm();
+      this.isShowForm = false;
+      this.$refs["fieldForm"].clearValidate();
+    },
+    resetFieldForm() {
+      this.fieldTemp = {
+        id: null,
+        userId: this.userId,
+        size: null,
+        type: null,
+        treeAge: null,
+        remark: null,
+        createTime: null,
+        updateTime: null
+      };
     }
   }
 };
