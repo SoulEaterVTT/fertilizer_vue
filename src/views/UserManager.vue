@@ -1,14 +1,26 @@
 <template>
   <div class="manager-contain">
-    <div class="content-header-search">
-      <svg-icon
-        :icon-class="add_icon_name"
-        @mouseover="handleAddMouseOver"
-        @mouseleave="handleAddMouseLeave"
-        @click="handleCreate"
-      />
+    <div class="head">
+      <el-form :inline="true" :model="reqTemp">
+        <span class="query-name">负责人：</span>
+        <el-select
+          v-model="reqTemp.parentId"
+          class="headSelect"
+          clearable
+          placeholder="请选择负责人"
+          @change="setParentValue"
+        >
+          <el-option v-for="item in parentData" :key="item.id" :label="item.name" :value="item.id" />
+        </el-select>
+        <el-input v-model="reqTemp.name" placeholder="姓名" class="headSelect"></el-input>
+
+        <el-input v-model="reqTemp.mobileNum" placeholder="手机号" class="headSelect"></el-input>
+
+        <el-button type="primary" @click="getUserList" icon="el-icon-search">查询</el-button>
+        <el-button type="primary" icon="el-icon-add" @click="handleCreate">添加</el-button>
+      </el-form>
     </div>
-    <div class="table-contain">
+    <div class="table-contain3">
       <el-table
         :data="tableData"
         border
@@ -146,8 +158,12 @@
             <el-table-column property="type" label="品种" align="center" />
             <el-table-column property="size" label="亩数" align="center" />
             <el-table-column property="treeAge" label="树龄" align="center" />
-            <el-table-column property="createTime" label="创建时间" align="center" />
-            <el-table-column property="updateTime" label="更新时间" align="center" />
+            <el-table-column label="创建时间" align="center">
+              <template slot-scope="scope">{{ scope.row.createTime | formatDate }}</template>
+            </el-table-column>
+            <el-table-column label="更新时间" align="center">
+              <template slot-scope="scope">{{ scope.row.updateTime | formatDate }}</template>
+            </el-table-column>
             <el-table-column property="remark" label="备注" align="center" />
 
             <el-table-column label="操作" align="center">
@@ -229,7 +245,13 @@ import {
   deleteFieldById,
   updateField
 } from "@/api/fieldApi.js";
+import moment from "moment";
 export default {
+  filters: {
+    formatDate: function(value) {
+      return moment(parseInt(value)).format("YYYY-MM-DD h:mm:ss");
+    }
+  },
   data() {
     var checkPhone = (rule, value, callback) => {
       const phoneReg = /^1[3|4|5|7|8|9][0-9]{9}$/;
@@ -320,6 +342,11 @@ export default {
         ],
         size: [{ required: true, message: "请输入亩数", trigger: "blur" }],
         treeAge: [{ required: true, message: "请输入树龄", trigger: "blur" }]
+      },
+      reqTemp: {
+        name: null,
+        mobileNum: null,
+        parentId: null
       }
     };
   },
@@ -366,10 +393,11 @@ export default {
       this.active = "";
     },
     getUserList() {
+      console.log(this.reqTemp);
       selectUser(
         this.paginations.pageIndex,
         this.paginations.pageSize,
-        {}
+        this.reqTemp
       ).then(res => {
         this.paginations.total = res.data.total;
         this.tableData = res.data.list;
@@ -455,6 +483,9 @@ export default {
     },
     setParentValue(event) {
       this.temp.parentId = event;
+    },
+    setReqTempValue(event) {
+      this.reqTemp.parentId = event;
     },
     getFieldList() {
       selectField(1, 15, this.fieldTemp).then(res => {

@@ -29,7 +29,6 @@ export const constantRouterMap = [
         meta: {
           title: '地块管理',
           icon: 'user',
-          affix: true
         }
       }
     ]
