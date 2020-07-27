@@ -393,7 +393,6 @@ export default {
       this.active = "";
     },
     getUserList() {
-      console.log(this.reqTemp);
       selectUser(
         this.paginations.pageIndex,
         this.paginations.pageSize,

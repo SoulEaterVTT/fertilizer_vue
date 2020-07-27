@@ -1,12 +1,21 @@
 <template>
   <div class="manager-contain">
-    <div :class="{ show: show }" class="content-header-search">
-      <svg-icon
-        :icon-class="add_icon_name"
-        @mouseover="handleAddMouseOver"
-        @mouseleave="handleAddMouseLeave"
-        @click="handleCreate"
-      />
+   <div class="head">
+      <el-form :inline="true" :model="reqTemp">
+        <span class="query-name">名称：</span>
+        <el-select
+          v-model="reqTemp.parentId"
+          class="headSelect"
+          clearable
+          placeholder="请选择病虫害名称"
+          @change="setParentValue"
+        >
+          <el-option v-for="item in parentData" :key="item.id" :label="item.name" :value="item.id" />
+        </el-select>
+
+        <el-button type="primary" @click="getUserList" icon="el-icon-search">查询</el-button>
+        <el-button type="primary" icon="el-icon-add" @click="handleCreate">添加</el-button>
+      </el-form>
     </div>
     <div class="table-contain">
       <el-table
@@ -18,9 +27,10 @@
         @cell-mouse-enter="handleMouseEnter"
         @cell-mouse-leave="handleMouseOut"
       >
-        <el-table-column property="name" label="姓名" align="center" />
-        <el-table-column property="mobileNum" label="手机号" align="center" />
-        <el-table-column property="address" label="地址" align="center" />
+        <el-table-column property="name" label="名称" align="center" />
+        <el-table-column property="mobileNum" label="类型" align="center" />
+        <el-table-column property="address" label="文字描述" align="center" />
+        <el-table-column property="address" label="图片描述" align="center" />
 
         <el-table-column label="操作" align="center">
           <template slot-scope="scope">
@@ -172,6 +182,11 @@ export default {
         parentId: null,
         createTime: null,
         updateTime: null
+      },
+      reqTemp: {
+        name: null,
+        mobileNum: null,
+        parentId: null
       },
       rules: {
         name: [

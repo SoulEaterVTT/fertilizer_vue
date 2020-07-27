@@ -23,11 +23,38 @@ export const constantRouterMap = [
         }
       },
       {
-        path: '/Field',
-        component: () => import('@/views/FieldManager'),
-        name: 'Field',
+        path: '/Variety',
+        component: () => import('@/views/VarietyManager'),
+        name: 'Variety',
         meta: {
-          title: '地块管理',
+          title: '品种管理',
+          icon: 'user',
+        }
+      },
+      {
+        path: '/Fertilizer',
+        component: () => import('@/views/FertilizerManager'),
+        name: 'Fertilizer',
+        meta: {
+          title: '肥料管理',
+          icon: 'user',
+        }
+      },
+      {
+        path: '/Soil',
+        component: () => import('@/views/SoilManager'),
+        name: 'Soil',
+        meta: {
+          title: '土壤管理',
+          icon: 'user',
+        }
+      },
+      {
+        path: '/Pest',
+        component: () => import('@/views/PestManager'),
+        name: 'Pest',
+        meta: {
+          title: '病虫害管理',
           icon: 'user',
         }
       }
