@@ -2,12 +2,12 @@
   <div class="manager-contain">
     <div class="head">
       <el-form :inline="true" :model="reqTemp">
-        <span class="query-name">负责人：</span>
+        <span class="query-name">区域：</span>
         <el-select
           v-model="reqTemp.parentId"
           class="headSelect"
           clearable
-          placeholder="请选择负责人"
+          placeholder="请选择区域"
           @change="setParentValue"
         >
           <el-option v-for="item in parentData" :key="item.id" :label="item.name" :value="item.id" />

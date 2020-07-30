@@ -57,6 +57,15 @@ export const constantRouterMap = [
           title: '病虫害管理',
           icon: 'user',
         }
+      },
+      {
+        path: '/Area',
+        component: () => import('@/views/Area'),
+        name: 'Area',
+        meta: {
+          title: '区域管理',
+          icon: 'user',
+        }
       }
     ]
   }
