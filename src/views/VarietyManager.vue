@@ -4,16 +4,21 @@
       <el-form :inline="true" :model="reqTemp">
         <span class="query-name">品种：</span>
         <el-select
-          v-model="reqTemp.parentId"
+          v-model="reqTemp.id"
           class="headSelect"
           clearable
           placeholder="请选择品种"
           @change="setParentValue"
         >
-          <el-option v-for="item in parentData" :key="item.id" :label="item.name" :value="item.id" />
+          <el-option
+            v-for="item in varietyData"
+            :key="item.id"
+            :label="item.treeName"
+            :value="item.id"
+          />
         </el-select>
 
-        <el-button type="primary" @click="getUserList" icon="el-icon-search">查询</el-button>
+        <el-button type="primary" @click="getVarietyList" icon="el-icon-search">查询</el-button>
         <el-button type="primary" icon="el-icon-add" @click="handleCreate">添加</el-button>
       </el-form>
     </div>
@@ -28,17 +33,13 @@
         @cell-mouse-enter="handleMouseEnter"
         @cell-mouse-leave="handleMouseOut"
       >
-        <el-table-column property="name" label="名称" align="center" />
-        <el-table-column  label="萌芽期" align="center">
-          <template slot-scope="scope">
-            <div>{{scope.name}}</div>
-          </template>
-        </el-table-column>
-        <el-table-column property="mobileNum" label="开花期" align="center" />
-        <el-table-column property="mobileNum" label="坐果期" align="center" />
-        <el-table-column property="mobileNum" label="促花膨果期" align="center" />
-        <el-table-column property="mobileNum" label="着色期" align="center" />
-        <el-table-column property="mobileNum" label="备注" align="center" />
+        <el-table-column property="treeName" label="名称" align="center" />
+        <el-table-column property="myTime" label="萌芽期" align="center" />
+        <el-table-column property="khTime" label="开花期" align="center" />
+        <el-table-column property="zgTime" label="坐果期" align="center" />
+        <el-table-column property="chpgTime" label="促花膨果期" align="center" />
+        <el-table-column property="zsTime" label="着色期" align="center" />
+        <el-table-column property="remark" label="备注" align="center" />
 
         <el-table-column label="操作" align="center">
           <template slot-scope="scope">
@@ -91,33 +92,104 @@
           >
             <div class="content">
               <div class="content-left">
-                <el-form-item prop="name" label="姓名">
-                  <el-input v-model="temp.name" placeholder="请输入姓名" />
+                <el-form-item prop="treeName" label="名称">
+                  <el-input v-model="temp.treeName" placeholder="请输入名称" />
                 </el-form-item>
-                <el-form-item prop="mobileNum" label="手机号">
-                  <el-input v-model="temp.mobileNum" placeholder="请输入手机号" />
+                <el-form-item prop="myTime" label="萌芽期">
+                  <el-input v-model="temp.myTime" placeholder="请输入注意事项" />
+                </el-form-item>
+                <el-form-item prop="khTime" label="开花期">
+                  <el-input v-model="temp.khTime" placeholder="请输入注意事项" />
+                </el-form-item>
+                <el-form-item prop="zgTime" label="坐果期">
+                  <el-input v-model="temp.zgTime" placeholder="请输入注意事项" />
+                </el-form-item>
+                <el-form-item prop="chpgTime" label="促花膨果期">
+                  <el-input v-model="temp.chpgTime" placeholder="请输入注意事项" />
+                </el-form-item>
+                <el-form-item prop="zsTime" label="着色期">
+                  <el-input v-model="temp.zsTime" placeholder="请输入注意事项" />
                 </el-form-item>
               </div>
               <div class="content-right">
-                <el-form-item label="负责人">
+                <el-form-item prop="remark" label="备注">
+                  <el-input v-model="temp.remark" placeholder="请输入备注" />
+                </el-form-item>
+                <!-- <el-form-item label="病虫害">
                   <el-select
-                    v-model="temp.parentId"
+                    v-model="temp.myBch"
                     style="width:100%"
-                    placeholder="请选择负责人"
-                    @change="setParentValue"
+                    multiple
+                    placeholder="请选择病虫害"
                   >
                     <el-option
-                      v-for="item in userData"
+                      v-for="item in bchData"
                       :key="item.id"
                       :label="item.name"
                       :value="item.id"
                     />
                   </el-select>
                 </el-form-item>
-
-                <el-form-item prop="address" label="地址">
-                  <el-input v-model="temp.address" placeholder="请输入地址" />
+                <el-form-item label="病虫害">
+                  <el-select
+                    v-model="temp.khBch"
+                    style="width:100%"
+                    multiple
+                    placeholder="请选择病虫害"
+                  >
+                    <el-option
+                      v-for="item in bchData"
+                      :key="item.id"
+                      :label="item.name"
+                      :value="item.id"
+                    />
+                  </el-select>
                 </el-form-item>
+                <el-form-item label="病虫害">
+                  <el-select
+                    v-model="temp.zgBch"
+                    style="width:100%"
+                    multiple
+                    placeholder="请选择病虫害"
+                  >
+                    <el-option
+                      v-for="item in bchData"
+                      :key="item.id"
+                      :label="item.name"
+                      :value="item.id"
+                    />
+                  </el-select>
+                </el-form-item>
+                <el-form-item label="病虫害">
+                  <el-select
+                    v-model="temp.chpgBch"
+                    style="width:100%"
+                    multiple
+                    placeholder="请选择病虫害"
+                  >
+                    <el-option
+                      v-for="item in bchData"
+                      :key="item.id"
+                      :label="item.name"
+                      :value="item.id"
+                    />
+                  </el-select>
+                </el-form-item>
+                <el-form-item label="病虫害">
+                  <el-select
+                    v-model="temp.zsBch"
+                    style="width:100%"
+                    multiple
+                    placeholder="请选择病虫害"
+                  >
+                    <el-option
+                      v-for="item in bchData"
+                      :key="item.id"
+                      :label="item.name"
+                      :value="item.id"
+                    />
+                  </el-select>
+                </el-form-item> -->
               </div>
             </div>
           </el-form>
@@ -138,79 +210,58 @@
 
 <script>
 import {
-  addField,
-  selectField,
-  deleteFieldById,
-  updateField
-} from "@/api/fieldApi.js";
-import { selectUser } from "@/api/userApi.js";
+  addTreeType,
+  deleteTreeTypeById,
+  updateTreeType,
+  selectTreeType
+} from "@/api/treeTypeApi.js";
+import { selectBch } from "@/api/bchApi.js";
+
 export default {
   data() {
-    var checkPhone = (rule, value, callback) => {
-      const phoneReg = /^1[3|4|5|7|8|9][0-9]{9}$/;
-      if (!value) {
-        return callback(new Error("电话号码不能为空"));
-      }
-      setTimeout(() => {
-        if (!Number.isInteger(+value)) {
-          callback(new Error("请输入数字值"));
-        } else {
-          if (phoneReg.test(value)) {
-            callback();
-          } else {
-            callback(new Error("电话号码格式不正确"));
-          }
-        }
-      }, 100);
-    };
     return {
       add_icon_name: "add_no",
       active: "",
       show: false,
       tableData: [],
-      userData: [],
-      // 需要给分页组件传的信息
+      varietyData: [],
+      bchData: [],
       paginations: {
-        total: 0, // 总数
-        pageIndex: 1, // 当前位于哪页
-        pageSize: 15, // 1页显示多少条
-        pageSizes: [15, 20], // 每页显示多少条
-        layout: "total, sizes, prev, pager, next, jumper" // 翻页属性
+        total: 0,
+        pageIndex: 1,
+        pageSize: 15,
+        pageSizes: [15, 20],
+        layout: "total, sizes, prev, pager, next, jumper"
       },
       dialogFormVisible: false,
       dialogStatus: "",
       temp: {
         id: null,
-        name: null,
-        mobileNum: null,
-        address: null,
-        password: null,
-        parentId: null,
+        treeName: null,
+        remark: null,
+        myTime: null,
+        khTime: null,
+        zgTime: null,
+        chpgTime: null,
+        zsTime: null,
+        myBch: null,
+        khBch: null,
+        zgBch: null,
+        chpgBch: null,
+        zsBch: null,
         createTime: null,
         updateTime: null
       },
       reqTemp: {
-        name: null,
-        mobileNum: null,
-        parentId: null
+        id: null
       },
       rules: {
-        name: [
-          { required: true, message: "请输入用户名", trigger: "blur" },
+        treeName: [
+          { required: true, message: "请输入品种名称", trigger: "blur" },
           {
             min: 2,
             max: 50,
             message: "长度在 2 到 50 个字符",
-            trigger: "blur"
-          }
-        ],
-        mobileNum: [{ required: true, validator: checkPhone, trigger: "blur" }],
-        address: [
-          { required: true, message: "请输入地址", trigger: "blur" },
-          {
-            min: 2,
-            max: 50,
-            message: "长度在 5 到 50 个字符",
             trigger: "blur"
           }
         ]
@@ -228,10 +279,11 @@ export default {
   },
   created() {},
   mounted() {
-    selectUser().then(res => {
-      this.userData = res.data;
+    selectBch(1, 500, {}).then(res => {
+      this.bchData = res.data.list;
     });
-    this.getFieldList();
+
+    this.getVarietyList();
   },
   methods: {
     setAccessValue(event) {
@@ -261,8 +313,8 @@ export default {
     mouseLeave() {
       this.active = "";
     },
-    getFieldList() {
-      selectUser(
+    getVarietyList() {
+      selectTreeType(
         this.paginations.pageIndex,
         this.paginations.pageSize,
         this.reqTemp
@@ -270,29 +322,32 @@ export default {
         this.paginations.total = res.data.total;
         this.tableData = res.data.list;
       });
+      selectTreeType(1, 500, {}).then(res => {
+        this.varietyData = res.data.list;
+      });
     },
     // 每页多少条切换
     handleSizeChange(pageSize) {
       this.paginations.pageSize = pageSize;
-      this.getFieldList();
+      this.getVarietyList();
     },
     // 上下分页
     handleCurrentChange(page) {
       this.paginations.pageIndex = page;
-      this.getFieldList();
+      this.getVarietyList();
     },
     handleDelete(row) {
-      this.$confirm("是否确定删除此地块?", "提示", {
+      this.$confirm("是否确定删除此品种?", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消"
       })
         .then(() => {
-          deleteFieldById(row.id).then(() => {
+          deleteTreeTypeById(row.id).then(() => {
             this.$message({
               message: "删除成功",
               type: "success"
             });
-            this.getFieldList();
+            this.getVarietyList();
           });
         })
         .catch(() => {
@@ -312,11 +367,18 @@ export default {
     resetTemp() {
       this.temp = {
         id: null,
-        name: null,
-        mobileNum: null,
-        address: null,
-        password: null,
-        parentId: null,
+        treeName: null,
+        remark: null,
+        myTime: null,
+        khTime: null,
+        zgTime: null,
+        chpgTime: null,
+        zsTime: null,
+        myBch: null,
+        khBch: null,
+        zgBch: null,
+        chpgBch: null,
+        zsBch: null,
         createTime: null,
         updateTime: null
       };
@@ -333,9 +395,14 @@ export default {
     createData() {
       this.$refs["dataForm"].validate(valid => {
         if (valid) {
-          addField(this.temp).then(() => {
+          // this.temp.myBch = this.temp.myBch.join();
+          // this.temp.khBch = this.temp.khBch.join();
+          // this.temp.zgBch = this.temp.zgBch.join();
+          // this.temp.chpgBch = this.temp.chpgBch.join();
+          // this.temp.zsBch = this.temp.zsBch.join();
+          addTreeType(this.temp).then(() => {
             this.dialogFormVisible = false;
-            this.getFieldList();
+            this.getVarietyList();
           });
         }
       });
@@ -343,9 +410,14 @@ export default {
     updateData() {
       this.$refs["dataForm"].validate(valid => {
         if (valid) {
-          updateField(this.temp).then(() => {
+          this.temp.myBch = this.temp.myBch.join();
+          this.temp.khBch = this.temp.khBch.join();
+          this.temp.zgBch = this.temp.zgBch.join();
+          this.temp.chpgBch = this.temp.chpgBch.join();
+          this.temp.zsBch = this.temp.zsBch.join();
+          updateTreeType(this.temp).then(() => {
             this.dialogFormVisible = false;
-            this.getFieldList();
+            this.getVarietyList();
           });
         }
       });

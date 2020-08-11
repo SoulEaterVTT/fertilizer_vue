@@ -66,6 +66,15 @@ export const constantRouterMap = [
           title: '区域管理',
           icon: 'user',
         }
+      },
+      {
+        path: '/Field',
+        component: () => import('@/views/FieldManager'),
+        name: 'Field',
+        meta: {
+          title: '地块管理',
+          icon: 'user',
+        }
       }
     ]
   }

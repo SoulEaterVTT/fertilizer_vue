@@ -6,7 +6,7 @@ export function addTr(reqData) {
 }
 // 根据ID删除土壤
 export function deleteTrById(id) {
-    return deleteData(`/tr/delete/${id}`)
+    return deleteData(`/tr/del/${id}`)
 }
 // 土壤更新
 export function updateTr(reqData) {

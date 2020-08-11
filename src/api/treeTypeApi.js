@@ -6,7 +6,7 @@ export function addTreeType(reqData) {
 }
 // 根据ID删除品种
 export function deleteTreeTypeById(id) {
-    return deleteData(`/treeType/delete/${id}`)
+    return deleteData(`/treeType/del/${id}`)
 }
 // 品种更新
 export function updateTreeType(reqData) {

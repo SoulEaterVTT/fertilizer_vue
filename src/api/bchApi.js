@@ -6,7 +6,7 @@ export function addBch(reqData) {
 }
 // 根据ID删除病虫害
 export function deleteBchById(id) {
-    return deleteData(`/bch/delete/${id}`)
+    return deleteData(`/bch/del/${id}`)
 }
 // 病虫害更新
 export function updateBch(reqData) {

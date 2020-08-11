@@ -112,8 +112,8 @@ export default {
       paginations: {
         total: 0,
         pageIndex: 1,
-        pageSize: 15,
-        pageSizes: [15, 20],
+        pageSize: 14,
+        pageSizes: [14, 20],
         layout: "total, sizes, prev, pager, next, jumper"
       },
       dialogFormVisible: false,

@@ -6,7 +6,7 @@ export function addFl(reqData) {
 }
 // 根据ID删除肥料
 export function deleteFlById(id) {
-    return deleteData(`/fl/delete/${id}`)
+    return deleteData(`/fl/del/${id}`)
 }
 // 肥料更新
 export function updateFl(reqData) {

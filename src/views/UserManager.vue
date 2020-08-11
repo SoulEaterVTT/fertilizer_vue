@@ -4,13 +4,18 @@
       <el-form :inline="true" :model="reqTemp">
         <span class="query-name">区域：</span>
         <el-select
-          v-model="reqTemp.parentId"
+          v-model="reqTemp.areaId"
           class="headSelect"
           clearable
           placeholder="请选择区域"
           @change="setParentValue"
         >
-          <el-option v-for="item in parentData" :key="item.id" :label="item.name" :value="item.id" />
+          <el-option
+            v-for="item in parentData"
+            :key="item.id"
+            :label="item.location"
+            :value="item.id"
+          />
         </el-select>
         <el-input v-model="reqTemp.name" placeholder="姓名" class="headSelect"></el-input>
 
@@ -94,17 +99,17 @@
                 </el-form-item>
               </div>
               <div class="content-right">
-                <el-form-item label="负责人">
+                <el-form-item label="区域">
                   <el-select
-                    v-model="temp.parentId"
+                    v-model="temp.areaId"
                     style="width:100%"
-                    placeholder="请选择负责人"
+                    placeholder="请选择区域"
                     @change="setParentValue"
                   >
                     <el-option
                       v-for="item in parentData"
                       :key="item.id"
-                      :label="item.name"
+                      :label="item.location"
                       :value="item.id"
                     />
                   </el-select>
@@ -155,16 +160,10 @@
             @cell-mouse-enter="handleMouseEnter"
             @cell-mouse-leave="handleMouseOut"
           >
-            <el-table-column property="type" label="品种" align="center" />
-            <el-table-column property="size" label="亩数" align="center" />
+            <el-table-column property="treeName" label="品种" align="center" />
+            <el-table-column property="tdSize" label="亩数" align="center" />
             <el-table-column property="treeAge" label="树龄" align="center" />
-            <el-table-column label="创建时间" align="center">
-              <template slot-scope="scope">{{ scope.row.createTime | formatDate }}</template>
-            </el-table-column>
-            <el-table-column label="更新时间" align="center">
-              <template slot-scope="scope">{{ scope.row.updateTime | formatDate }}</template>
-            </el-table-column>
-            <el-table-column property="remark" label="备注" align="center" />
+            <el-table-column property="tdRemark" label="备注" align="center" />
 
             <el-table-column label="操作" align="center">
               <template slot-scope="scope">
@@ -205,13 +204,25 @@
             label-width="100px"
             style="margin:19px;"
           >
-            <el-form-item prop="type" label="品种">
-              <el-input v-model="fieldTemp.type" />
+            <el-form-item prop="treeTypeId" label="品种">
+              <el-select
+                v-model="fieldTemp.treeTypeId"
+                class="headSelect"
+                clearable
+                placeholder="请选择品种"
+              >
+                <el-option
+                  v-for="item in varietyData"
+                  :key="item.id"
+                  :label="item.treeName"
+                  :value="item.id"
+                />
+              </el-select>
             </el-form-item>
             <el-form-item prop="size" label="亩数">
               <el-input v-model="fieldTemp.size" />
             </el-form-item>
-            <el-form-item prop="treeAge" label="树龄">
+            <el-form-item prop="treeAge" label="种树时间">
               <el-input v-model="fieldTemp.treeAge" />
             </el-form-item>
             <el-form-item label="备注">
@@ -237,7 +248,7 @@ import {
   selectUser,
   deleteUserById,
   updateUser,
-  selectParentUser
+  getAreaList
 } from "@/api/userApi.js";
 import {
   addField,
@@ -245,6 +256,7 @@ import {
   deleteFieldById,
   updateField
 } from "@/api/fieldApi.js";
+import { selectTreeType } from "@/api/treeTypeApi.js";
 import moment from "moment";
 export default {
   filters: {
@@ -277,14 +289,15 @@ export default {
       show: false,
       tableData: [],
       parentData: [],
+      varietyData: [],
       fieldData: [],
       isShowForm: false,
       userId: null,
       paginations: {
         total: 0,
         pageIndex: 1,
-        pageSize: 15,
-        pageSizes: [15, 20],
+        pageSize: 14,
+        pageSizes: [14, 20],
         layout: "total, sizes, prev, pager, next, jumper"
       },
       dialogFormVisible: false,
@@ -297,7 +310,7 @@ export default {
         mobileNum: null,
         address: null,
         password: null,
-        parentId: null,
+        areaId: null,
         createTime: null,
         updateTime: null
       },
@@ -305,8 +318,9 @@ export default {
         id: null,
         userId: null,
         size: null,
-        type: null,
+        treeName: null,
         treeAge: null,
+        treeTypeId: null,
         remark: null,
         createTime: null,
         updateTime: null
@@ -331,22 +345,13 @@ export default {
             trigger: "blur"
           }
         ],
-        type: [
-          { required: true, message: "请输入品种", trigger: "blur" },
-          {
-            min: 2,
-            max: 50,
-            message: "长度在 2 到 50 个字符",
-            trigger: "blur"
-          }
-        ],
         size: [{ required: true, message: "请输入亩数", trigger: "blur" }],
         treeAge: [{ required: true, message: "请输入树龄", trigger: "blur" }]
       },
       reqTemp: {
         name: null,
         mobileNum: null,
-        parentId: null
+        areaId: null
       }
     };
   },
@@ -361,7 +366,10 @@ export default {
   },
   created() {},
   mounted() {
-    selectParentUser().then(res => {
+    selectTreeType(1, 500, {}).then(res => {
+      this.varietyData = res.data.list;
+    });
+    getAreaList().then(res => {
       this.parentData = res.data;
     });
     this.getUserList();
@@ -450,7 +458,7 @@ export default {
         mobileNum: null,
         address: null,
         password: null,
-        parentId: null,
+        areaId: null,
         createTime: null,
         updateTime: null
       };
@@ -481,13 +489,10 @@ export default {
       });
     },
     setParentValue(event) {
-      this.temp.parentId = event;
-    },
-    setReqTempValue(event) {
-      this.reqTemp.parentId = event;
+      this.temp.areaId = event;
     },
     getFieldList() {
-      selectField(1, 15, this.fieldTemp).then(res => {
+      selectField(1, 15, { userId: this.userId }).then(res => {
         this.fieldData = res.data.list;
       });
     },

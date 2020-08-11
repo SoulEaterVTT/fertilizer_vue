@@ -4,19 +4,20 @@
       <el-form :inline="true" :model="reqTemp">
         <span class="query-name">名称：</span>
         <el-select
-          v-model="reqTemp.id"
+          v-model="reqTemp.parentId"
           class="headSelect"
           clearable
-          placeholder="请选择病虫害名称"
-          @change="setBchValue"
+          placeholder="请选择肥料"
+          @change="setParentValue"
         >
-          <el-option v-for="item in bchData" :key="item.id" :label="item.name" :value="item.id" />
+          <el-option v-for="item in parentData" :key="item.id" :label="item.name" :value="item.id" />
         </el-select>
-        <el-button type="primary" @click="getBchList" icon="el-icon-search">查询</el-button>
+
+        <el-button type="primary" @click="getUserList" icon="el-icon-search">查询</el-button>
         <el-button type="primary" icon="el-icon-add" @click="handleCreate">添加</el-button>
       </el-form>
     </div>
-    <div class="table-contain3">
+    <div class="table-contain">
       <el-table
         :data="tableData"
         border
@@ -27,10 +28,7 @@
         @cell-mouse-leave="handleMouseOut"
       >
         <el-table-column property="name" label="名称" align="center" />
-        <el-table-column property="wbmsRemark" label="文字描述" align="center" />
-        <el-table-column property="fileRemark" label="图片描述" align="center" />
-        <el-table-column property="prevention" label="防治" align="center" />
-        <el-table-column property="remark" label="备注" align="center" />
+        <el-table-column property="address" label="属性" align="center" />
 
         <el-table-column label="操作" align="center">
           <template slot-scope="scope">
@@ -83,22 +81,32 @@
           >
             <div class="content">
               <div class="content-left">
-                <el-form-item prop="name" label="名称">
-                  <el-input v-model="temp.name" placeholder="请输入名称" />
+                <el-form-item prop="name" label="姓名">
+                  <el-input v-model="temp.name" placeholder="请输入姓名" />
                 </el-form-item>
-                <el-form-item label="文字描述">
-                  <el-input v-model="temp.wbmsRemark" placeholder="请输入文字描述" />
-                </el-form-item>
-                <el-form-item label="防治">
-                  <el-input v-model="temp.prevention" placeholder="请输入如何防治" />
+                <el-form-item prop="mobileNum" label="手机号">
+                  <el-input v-model="temp.mobileNum" placeholder="请输入手机号" />
                 </el-form-item>
               </div>
               <div class="content-right">
-                <el-form-item label="图片描述">
-                  <el-input v-model="temp.fileRemark" placeholder="请输入图片描述" />
+                <el-form-item label="负责人">
+                  <el-select
+                    v-model="temp.parentId"
+                    style="width:100%"
+                    placeholder="请选择负责人"
+                    @change="setParentValue"
+                  >
+                    <el-option
+                      v-for="item in userData"
+                      :key="item.id"
+                      :label="item.name"
+                      :value="item.id"
+                    />
+                  </el-select>
                 </el-form-item>
-                <el-form-item label="备注">
-                  <el-input v-model="temp.remark" placeholder="请输入备注" />
+
+                <el-form-item prop="address" label="地址">
+                  <el-input v-model="temp.address" placeholder="请输入地址" />
                 </el-form-item>
               </div>
             </div>
@@ -119,40 +127,66 @@
 </template>
 
 <script>
-import { addBch, updateBch, deleteBchById, selectBch } from "@/api/bchApi.js";
+import {
+  addField,
+  selectField,
+  deleteFieldById,
+  updateField
+} from "@/api/fieldApi.js";
+import { selectUser } from "@/api/userApi.js";
 export default {
   data() {
+    var checkPhone = (rule, value, callback) => {
+      const phoneReg = /^1[3|4|5|7|8|9][0-9]{9}$/;
+      if (!value) {
+        return callback(new Error("电话号码不能为空"));
+      }
+      setTimeout(() => {
+        if (!Number.isInteger(+value)) {
+          callback(new Error("请输入数字值"));
+        } else {
+          if (phoneReg.test(value)) {
+            callback();
+          } else {
+            callback(new Error("电话号码格式不正确"));
+          }
+        }
+      }, 100);
+    };
     return {
       add_icon_name: "add_no",
       active: "",
       show: false,
       tableData: [],
-      bchData: [],
+      userData: [],
+      // 需要给分页组件传的信息
       paginations: {
-        total: 0,
-        pageIndex: 1,
-        pageSize: 10,
-        pageSizes: [10, 20],
-        layout: "total, sizes, prev, pager, next, jumper"
+        total: 0, // 总数
+        pageIndex: 1, // 当前位于哪页
+        pageSize: 15, // 1页显示多少条
+        pageSizes: [15, 20], // 每页显示多少条
+        layout: "total, sizes, prev, pager, next, jumper" // 翻页属性
       },
       dialogFormVisible: false,
       dialogStatus: "",
       temp: {
         id: null,
         name: null,
-        wbmsRemark: null,
-        fileRemark: null,
-        remark: null,
-        prevention: null,
+        mobileNum: null,
+        address: null,
+        password: null,
+        parentId: null,
         createTime: null,
         updateTime: null
       },
       reqTemp: {
-        id: null
+        name: null,
+        mobileNum: null,
+        parentId: null
       },
       rules: {
         name: [
-          { required: true, message: "请输入名称", trigger: "blur" },
+          { required: true, message: "请输入用户名", trigger: "blur" },
           {
             min: 2,
             max: 50,
@@ -160,21 +194,13 @@ export default {
             trigger: "blur"
           }
         ],
-        fileRemark: [
-          { required: true, message: "请输入图片描述", trigger: "blur" },
+        mobileNum: [{ required: true, validator: checkPhone, trigger: "blur" }],
+        address: [
+          { required: true, message: "请输入地址", trigger: "blur" },
           {
             min: 2,
             max: 50,
-            message: "长度在 2 到 50 个字符",
-            trigger: "blur"
-          }
-        ],
-        remark: [
-          { required: true, message: "请输入备注", trigger: "blur" },
-          {
-            min: 2,
-            max: 50,
-            message: "长度在 2 到 50 个字符",
+            message: "长度在 5 到 50 个字符",
             trigger: "blur"
           }
         ]
@@ -192,7 +218,10 @@ export default {
   },
   created() {},
   mounted() {
-    this.getBchList();
+    selectUser().then(res => {
+      this.userData = res.data;
+    });
+    this.getFieldList();
   },
   methods: {
     setAccessValue(event) {
@@ -222,41 +251,38 @@ export default {
     mouseLeave() {
       this.active = "";
     },
-    getBchList() {
-      selectBch(
+    getFieldList() {
+      selectField(
         this.paginations.pageIndex,
         this.paginations.pageSize,
-        this.reqTemp
+        {}
       ).then(res => {
         this.paginations.total = res.data.total;
         this.tableData = res.data.list;
-      });
-      selectBch(1, 500, {}).then(res => {
-        this.bchData = res.data.list;
       });
     },
     // 每页多少条切换
     handleSizeChange(pageSize) {
       this.paginations.pageSize = pageSize;
-      this.getBchList();
+      this.getFieldList();
     },
     // 上下分页
     handleCurrentChange(page) {
       this.paginations.pageIndex = page;
-      this.getBchList();
+      this.getFieldList();
     },
     handleDelete(row) {
-      this.$confirm("是否确定删除此病虫害?", "提示", {
+      this.$confirm("是否确定删除此地块?", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消"
       })
         .then(() => {
-          deleteBchById(row.id).then(() => {
+          deleteFieldById(row.id).then(() => {
             this.$message({
               message: "删除成功",
               type: "success"
             });
-            this.getBchList();
+            this.getFieldList();
           });
         })
         .catch(() => {
@@ -277,10 +303,10 @@ export default {
       this.temp = {
         id: null,
         name: null,
-        wbmsRemark: null,
-        fileRemark: null,
-        remark: null,
-        prevention: null,
+        mobileNum: null,
+        address: null,
+        password: null,
+        parentId: null,
         createTime: null,
         updateTime: null
       };
@@ -297,9 +323,9 @@ export default {
     createData() {
       this.$refs["dataForm"].validate(valid => {
         if (valid) {
-          addBch(this.temp).then(() => {
+          addField(this.temp).then(() => {
             this.dialogFormVisible = false;
-            this.getBchList();
+            this.getFieldList();
           });
         }
       });
@@ -307,15 +333,15 @@ export default {
     updateData() {
       this.$refs["dataForm"].validate(valid => {
         if (valid) {
-          updateBch(this.temp).then(() => {
+          updateField(this.temp).then(() => {
             this.dialogFormVisible = false;
-            this.getBchList();
+            this.getFieldList();
           });
         }
       });
     },
-    setBchValue(event) {
-      this.temp.id = event;
+    setParentValue(event) {
+      this.temp.parentId = event;
     },
     click() {
       this.show = !this.show;

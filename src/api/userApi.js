@@ -23,8 +23,8 @@ export function selectUser(page, size, reqData) {
   return post(`/user/getList/${page}/${size}`, reqData)
 }
 
-// 查询父级用户
-export function selectParentUser() {
-  return get(`/user/getParentList`)
+// 获取所有区域
+export function getAreaList() {
+  return get(`/user/getAreaList`)
 }
 
