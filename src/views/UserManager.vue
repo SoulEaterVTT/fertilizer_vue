@@ -198,7 +198,7 @@
         >
           <el-form
             ref="fieldForm"
-            :model="fieldTemp"
+            :model="fieldEditTemp"
             :rules="rules"
             label-position="right"
             label-width="100px"
@@ -206,7 +206,7 @@
           >
             <el-form-item prop="treeTypeId" label="品种">
               <el-select
-                v-model="fieldTemp.treeTypeId"
+                v-model="fieldEditTemp.treeTypeId"
                 class="headSelect"
                 clearable
                 placeholder="请选择品种"
@@ -219,20 +219,25 @@
                 />
               </el-select>
             </el-form-item>
-            <el-form-item prop="size" label="亩数">
-              <el-input v-model="fieldTemp.size" />
+            <el-form-item prop="tdSize" label="亩数">
+              <el-input v-model="fieldEditTemp.tdSize" />
             </el-form-item>
             <el-form-item prop="treeAge" label="种树时间">
-              <el-input v-model="fieldTemp.treeAge" />
+              <el-input v-model="fieldEditTemp.treeAge" />
             </el-form-item>
             <el-form-item label="备注">
-              <el-input v-model="fieldTemp.remark" type="textarea" :rows="5" placeholder="请输入内容" />
+              <el-input
+                v-model="fieldEditTemp.tdRemark"
+                type="textarea"
+                :rows="5"
+                placeholder="请输入内容"
+              />
             </el-form-item>
           </el-form>
           <span slot="footer" class="dialog-footer">
             <el-button
               type="primary"
-              @click="fielDialogStatus==='create'?createFieldData():updateFieldData()"
+              @click="fielDialogStatus=='create'?createFieldData():updateFieldData()"
             >确 定</el-button>
             <el-button @click="closeDialog">取 消</el-button>
           </span>
@@ -254,7 +259,8 @@ import {
   addField,
   selectField,
   deleteFieldById,
-  updateField
+  updateField,
+  selectFieldDetail
 } from "@/api/fieldApi.js";
 import { selectTreeType } from "@/api/treeTypeApi.js";
 import moment from "moment";
@@ -325,6 +331,26 @@ export default {
         createTime: null,
         updateTime: null
       },
+      fieldEditTemp: {
+        tdId: null,
+        tdRemark: null,
+        tdSize: null,
+        treeAge: null,
+        treeName: null,
+        userAddress: null,
+        userId: null,
+        userMobileNum: null,
+        userName: null,
+        treeTypeId: null
+      },
+
+// id: "bc3739b0-33e6-40b5-bb25-df095e878ac3"
+// remark: ""
+// size: "5"
+// treeAge: 2014
+// treeTypeId: "c2297b3a-a539-46cd-8fee-390854e9ab19"
+// userId: "00b12305-0472-48cf-ad05-37bce021b901"
+
       rules: {
         name: [
           { required: true, message: "请输入用户名", trigger: "blur" },
@@ -447,7 +473,6 @@ export default {
     },
     handleDetail(row) {
       this.userId = row.id;
-      this.fieldTemp.userId = row.id;
       this.fieldDialogFormVisible = true;
       this.getFieldList();
     },
@@ -501,9 +526,12 @@ export default {
       this.isShowForm = true;
     },
     handleUpdateField(row) {
-      this.fieldTemp = row;
-      this.fielDialogStatus = "update";
-      this.isShowForm = true;
+      selectFieldDetail(row.tdId).then(res => {
+        console.log(res);
+      });
+      // this.fieldEditTemp = row;
+      // this.fielDialogStatus = "update";
+      // this.isShowForm = true;
     },
     handleDeleteField(row) {
       this.$confirm("是否确定删除此地块?", "提示", {
@@ -511,7 +539,7 @@ export default {
         cancelButtonText: "取消"
       })
         .then(() => {
-          deleteFieldById(row.id).then(() => {
+          deleteFieldById(row.tdId).then(() => {
             this.$message({
               message: "删除成功",
               type: "success"
@@ -528,6 +556,14 @@ export default {
     createFieldData() {
       this.$refs["fieldForm"].validate(valid => {
         if (valid) {
+          this.fieldTemp = {
+            id: this.fieldEditTemp.tdId,
+            userId: this.userId,
+            size: this.fieldEditTemp.tdSize,
+            treeAge: this.fieldEditTemp.treeAge,
+            treeTypeId: this.fieldEditTemp.treeTypeId,
+            remark: this.fieldEditTemp.tdRemark
+          };
           addField(this.fieldTemp).then(() => {
             this.getFieldList();
             this.closeDialog();
@@ -538,6 +574,14 @@ export default {
     updateFieldData() {
       this.$refs["fieldForm"].validate(valid => {
         if (valid) {
+          this.fieldTemp = {
+            id: this.fieldEditTemp.tdId,
+            userId: this.userId,
+            size: this.fieldEditTemp.tdSize,
+            treeAge: this.fieldEditTemp.treeAge,
+            treeTypeId: this.fieldEditTemp.treeTypeId,
+            remark: this.fieldEditTemp.tdRemark
+          };
           updateField(this.fieldTemp).then(() => {
             this.getFieldList();
             this.closeDialog();
@@ -553,13 +597,23 @@ export default {
     resetFieldForm() {
       this.fieldTemp = {
         id: null,
-        userId: this.userId,
+        userId: null,
         size: null,
-        type: null,
         treeAge: null,
         remark: null,
         createTime: null,
         updateTime: null
+      };
+      this.fieldEditTemp = {
+        tdId: null,
+        tdRemark: null,
+        tdSize: null,
+        treeAge: null,
+        treeName: null,
+        userAddress: null,
+        userId: null,
+        userMobileNum: null,
+        userName: null
       };
     }
   }

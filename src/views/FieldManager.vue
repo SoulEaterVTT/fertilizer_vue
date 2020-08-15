@@ -17,9 +17,9 @@
         <el-button type="primary" icon="el-icon-add" @click="handleCreate">添加</el-button>
       </el-form>
     </div>
-    <div class="table-contain">
+    <div class="form-content2" :style="active" @mouseover="mouseOver" @mouseleave="mouseLeave">
       <el-table
-        :data="tableData"
+        :data="fieldData"
         border
         stripe
         highlight-current-row
@@ -27,101 +27,28 @@
         @cell-mouse-enter="handleMouseEnter"
         @cell-mouse-leave="handleMouseOut"
       >
-        <el-table-column property="name" label="名称" align="center" />
-        <el-table-column property="address" label="属性" align="center" />
+        <el-table-column property="treeName" label="品种" align="center" />
+        <el-table-column property="tdSize" label="亩数" align="center" />
+        <el-table-column property="treeAge" label="树龄" align="center" />
+        <el-table-column property="tdRemark" label="备注" align="center" />
 
         <el-table-column label="操作" align="center">
           <template slot-scope="scope">
             <div>
-              <svg-icon style="color:#bfcbd9" icon-class="edit" @click="handleEdit(scope.row)" />
-              <svg-icon style="color:#bfcbd9" icon-class="delete" @click="handleDelete(scope.row)" />
+              <svg-icon
+                style="color:#bfcbd9"
+                icon-class="edit"
+                @click="handleUpdateField(scope.row)"
+              />
+              <svg-icon
+                style="color:#bfcbd9"
+                icon-class="delete"
+                @click="handleDeleteField(scope.row)"
+              />
             </div>
           </template>
         </el-table-column>
       </el-table>
-      <el-row class="elrow-class">
-        <el-col :span="24">
-          <div class="pagination">
-            <el-pagination
-              v-if="paginations.total > 0"
-              background
-              :page-sizes="paginations.pageSizes"
-              :page-size="paginations.pageSize"
-              :layout="paginations.layout"
-              :total="paginations.total"
-              @current-change="handleCurrentChange"
-              @size-change="handleSizeChange"
-            />
-          </div>
-        </el-col>
-      </el-row>
-
-      <el-drawer
-        ref="drawer"
-        :visible.sync="dialogFormVisible"
-        direction="rtl"
-        :modal="false"
-        :show-close="false"
-        size="100%"
-        class="form-container"
-      >
-        <div
-          class="form-content"
-          style="padding-top:10%"
-          :style="active"
-          @mouseover="mouseOver"
-          @mouseleave="mouseLeave"
-        >
-          <el-form
-            ref="dataForm"
-            :rules="rules"
-            :model="temp"
-            label-position="right"
-            label-width="100px"
-          >
-            <div class="content">
-              <div class="content-left">
-                <el-form-item prop="name" label="姓名">
-                  <el-input v-model="temp.name" placeholder="请输入姓名" />
-                </el-form-item>
-                <el-form-item prop="mobileNum" label="手机号">
-                  <el-input v-model="temp.mobileNum" placeholder="请输入手机号" />
-                </el-form-item>
-              </div>
-              <div class="content-right">
-                <el-form-item label="负责人">
-                  <el-select
-                    v-model="temp.parentId"
-                    style="width:100%"
-                    placeholder="请选择负责人"
-                    @change="setParentValue"
-                  >
-                    <el-option
-                      v-for="item in userData"
-                      :key="item.id"
-                      :label="item.name"
-                      :value="item.id"
-                    />
-                  </el-select>
-                </el-form-item>
-
-                <el-form-item prop="address" label="地址">
-                  <el-input v-model="temp.address" placeholder="请输入地址" />
-                </el-form-item>
-              </div>
-            </div>
-          </el-form>
-          <div slot="footer" class="form-footer">
-            <el-button class="cancle-btn" @click="dialogFormVisible = false">取消</el-button>
-
-            <el-button
-              type="primary"
-              class="affirm-btn"
-              @click="dialogStatus === 'create' ? createData() : updateData()"
-            >确认</el-button>
-          </div>
-        </div>
-      </el-drawer>
     </div>
   </div>
 </template>
