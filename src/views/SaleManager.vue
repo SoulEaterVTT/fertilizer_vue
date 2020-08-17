@@ -1,7 +1,26 @@
 <template>
   <div class="manager-contain">
     <div class="head">
-      <el-form :inline="true">
+      <el-form :inline="true" :model="reqTemp">
+        <span class="query-name">区域：</span>
+        <el-select v-model="reqTemp.areaId" class="headSelect" clearable placeholder="请选择区域">
+          <el-option
+            v-for="item in parentData"
+            :key="item.id"
+            :label="item.location"
+            :value="item.id"
+          />
+        </el-select>
+        <span class="query-name">肥料：</span>
+        <el-select v-model="reqTemp.flId" class="headSelect" clearable placeholder="请选择肥料">
+          <el-option
+            v-for="item in fertilizerData"
+            :key="item.id"
+            :label="item.name"
+            :value="item.id"
+          />
+        </el-select>
+        <el-button type="primary" @click="getSaleList" icon="el-icon-search">查询</el-button>
         <el-button type="primary" icon="el-icon-add" @click="handleCreate">添加</el-button>
       </el-form>
     </div>
@@ -15,21 +34,12 @@
         @cell-mouse-enter="handleMouseEnter"
         @cell-mouse-leave="handleMouseOut"
       >
-        <el-table-column property="name" label="名称" align="center" />
-        <el-table-column property="jhPrice" label="进价" align="center" />
-        <el-table-column property="pfPrice" label="批发价" align="center" />
-        <el-table-column property="lsPrice" label="单价" align="center" />
-        <el-table-column property="detail" label="属性" align="center" />
+        <el-table-column property="areaName" label="区域名称" align="center" />
+        <el-table-column property="flName" label="肥料名称" align="center" />
+        <el-table-column property="num" label="数量" align="center" />
+        <el-table-column property="total" label="价格" align="center" />
+        <el-table-column property="createTime" label="时间" align="center" />
         <el-table-column property="remark" label="备注" align="center" />
-
-        <el-table-column label="操作" align="center">
-          <template slot-scope="scope">
-            <div>
-              <svg-icon style="color:#bfcbd9" icon-class="edit" @click="handleEdit(scope.row)" />
-              <svg-icon style="color:#bfcbd9" icon-class="delete" @click="handleDelete(scope.row)" />
-            </div>
-          </template>
-        </el-table-column>
       </el-table>
       <el-row class="elrow-class">
         <el-col :span="24">
@@ -73,22 +83,30 @@
           >
             <div class="content">
               <div class="content-left">
-                <el-form-item prop="name" label="名称">
-                  <el-input v-model="temp.name" placeholder="请输入名称" />
+                <el-form-item prop="areaId" label="区域">
+                  <el-select v-model="temp.areaId" style="width:100%" placeholder="请选择区域">
+                    <el-option
+                      v-for="item in parentData"
+                      :key="item.id"
+                      :label="item.location"
+                      :value="item.id"
+                    />
+                  </el-select>
                 </el-form-item>
-                <el-form-item label="进价">
-                  <el-input v-model="temp.jhPrice" placeholder="请输入进价" />
-                </el-form-item>
-                <el-form-item label="属性">
-                  <el-input v-model="temp.detail" placeholder="请输入属性" />
+                <el-form-item prop="num" label="数量">
+                  <el-input v-model="temp.num" placeholder="请输入数量" />
                 </el-form-item>
               </div>
               <div class="content-right">
-                <el-form-item label="批发价">
-                  <el-input v-model="temp.pfPrice" placeholder="请输入批发价" />
-                </el-form-item>
-                <el-form-item label="单价">
-                  <el-input v-model="temp.lsPrice" placeholder="请输入单价" />
+                <el-form-item prop="flId" label="肥料">
+                  <el-select v-model="temp.flId" style="width:100%" clearable placeholder="请选择肥料">
+                    <el-option
+                      v-for="item in fertilizerData"
+                      :key="item.id"
+                      :label="item.name"
+                      :value="item.id"
+                    />
+                  </el-select>
                 </el-form-item>
                 <el-form-item label="备注">
                   <el-input v-model="temp.remark" placeholder="请输入备注" />
@@ -99,11 +117,7 @@
           <div slot="footer" class="form-footer">
             <el-button class="cancle-btn" @click="dialogFormVisible = false">取消</el-button>
 
-            <el-button
-              type="primary"
-              class="affirm-btn"
-              @click="dialogStatus === 'create' ? createData() : updateData()"
-            >确认</el-button>
+            <el-button type="primary" class="affirm-btn" @click="createData()">确认</el-button>
           </div>
         </div>
       </el-drawer>
@@ -112,7 +126,10 @@
 </template>
 
 <script>
-import { addFl, selectFl, deleteFlById, updateFl } from "@/api/flApi.js";
+import { selectFl } from "@/api/flApi.js";
+import { getAreaList } from "@/api/userApi.js";
+import { selectTreeType } from "@/api/treeTypeApi.js";
+import { addSale, selectSale } from "@/api/saleApi.js";
 import moment from "moment";
 export default {
   filters: {
@@ -126,6 +143,9 @@ export default {
       active: "",
       show: false,
       tableData: [],
+      fertilizerData: [],
+      parentData: [],
+      varietyData: [],
       paginations: {
         total: 0,
         pageIndex: 1,
@@ -137,52 +157,27 @@ export default {
       dialogStatus: "",
       temp: {
         id: null,
-        name: null,
-        remark: null,
-        jhPrice: null,
-        pfPrice: null,
-        lsPrice: null,
-        detail: null,
-        createTime: null,
-        updateTime: null
+        areaId: null,
+        flId: null,
+        num: null,
+        remark: null
+      },
+      reqTemp: {
+        flId: null,
+        areaId: null
       },
       rules: {
-        name: [
-          { required: true, message: "请输入名称", trigger: "blur" },
+        num: [
+          { required: true, message: "请输入数量", trigger: "blur" },
           {
-            min: 2,
-            max: 50,
-            message: "长度在 2 到 50 个字符",
+            min: 1,
+            max: 10,
+            message: "长度在 1 到 10 个字符",
             trigger: "blur"
           }
         ],
-        jhPrice: [
-          { required: true, message: "请输入进价", trigger: "blur" },
-          {
-            min: 2,
-            max: 50,
-            message: "长度在 2 到 50 个字符",
-            trigger: "blur"
-          }
-        ],
-        pfPrice: [
-          { required: true, message: "请输入批发价格", trigger: "blur" },
-          {
-            min: 2,
-            max: 50,
-            message: "长度在 2 到 50 个字符",
-            trigger: "blur"
-          }
-        ],
-        lsPrice: [
-          { required: true, message: "请输入单价", trigger: "blur" },
-          {
-            min: 2,
-            max: 50,
-            message: "长度在 2 到 50 个字符",
-            trigger: "blur"
-          }
-        ]
+        areaId: [{ required: true, message: "请选择区域", trigger: "change" }],
+        flId: [{ required: true, message: "请选择区域", trigger: "change" }]
       }
     };
   },
@@ -197,7 +192,16 @@ export default {
   },
   created() {},
   mounted() {
-    this.getFlList();
+    selectTreeType(1, 500, {}).then(res => {
+      this.varietyData = res.data.list;
+    });
+    getAreaList().then(res => {
+      this.parentData = res.data;
+    });
+    selectFl(1, 100, {}).then(res => {
+      this.fertilizerData = res.data.list;
+    });
+    this.getSaleList();
   },
   methods: {
     handleMouseEnter: function(row, column, cell, event) {
@@ -225,48 +229,30 @@ export default {
     mouseLeave() {
       this.active = "";
     },
-    getFlList() {
-      selectFl(this.paginations.pageIndex, this.paginations.pageSize, {}).then(
-        res => {
-          this.paginations.total = res.data.total;
-          this.tableData = res.data.list;
-        }
-      );
+    getSaleList() {
+      selectSale(
+        this.paginations.pageIndex,
+        this.paginations.pageSize,
+        this.reqTemp
+      ).then(res => {
+        this.paginations.total = res.data.total;
+        this.tableData = res.data.list;
+      });
     },
     // 每页多少条切换
     handleSizeChange(pageSize) {
       this.paginations.pageSize = pageSize;
-      this.getFlList();
+      this.getSaleList();
     },
     // 上下分页
     handleCurrentChange(page) {
       this.paginations.pageIndex = page;
-      this.getFlList();
+      this.getSaleList();
     },
     handleCreate() {
       this.resetTemp();
       this.dialogStatus = "create";
       this.dialogFormVisible = true;
-    },
-    handleDelete(row) {
-      this.$confirm("是否确定删除此产品?", "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消"
-      })
-        .then(() => {
-          deleteFlById(row.id).then(() => {
-            this.$message({
-              message: "删除成功",
-              type: "success"
-            });
-            this.getFlList();
-          });
-        })
-        .catch(() => {
-          this.$message({
-            message: "已取消删除"
-          });
-        });
     },
     handleEdit(row) {
       this.temp = row;
@@ -276,37 +262,18 @@ export default {
     resetTemp() {
       this.temp = {
         id: null,
-        name: null,
-        remark: null,
-        jhPrice: null,
-        pfPrice: null,
-        lsPrice: null,
-        detail: null,
-        createTime: null,
-        updateTime: null
+        areaId: null,
+        flId: null,
+        num: null,
+        remark: null
       };
-    },
-    handleCreate() {
-      this.resetTemp();
-      this.dialogStatus = "create";
-      this.dialogFormVisible = true;
     },
     createData() {
       this.$refs["dataForm"].validate(valid => {
         if (valid) {
-          addFl(this.temp).then(() => {
+          addSale(this.temp).then(() => {
             this.dialogFormVisible = false;
-            this.getFlList();
-          });
-        }
-      });
-    },
-    updateData() {
-      this.$refs["dataForm"].validate(valid => {
-        if (valid) {
-          updateFl(this.temp).then(() => {
-            this.dialogFormVisible = false;
-            this.getFlList();
+            this.getSaleList();
           });
         }
       });

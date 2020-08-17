@@ -5,7 +5,7 @@ import { isEmpty } from '@/utils/mUtils'
 let baseUrl = ''
 switch (process.env.NODE_ENV) {
   case 'development':
-    baseUrl = 'http://localhost:8085/fertilizer' // 这里是本地的请求
+    baseUrl = 'http://localhost:8086/fertilizer' // 这里是本地的请求
     break
   case 'test':
     baseUrl = '' // 测试环境

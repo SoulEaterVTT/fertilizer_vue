@@ -1,4 +1,4 @@
-import { get,put, post, deleteData } from '../utils/axios'
+import { get, put, post, deleteData } from '../utils/axios'
 
 // 添加地块
 export function addField(reqData) {
@@ -20,4 +20,8 @@ export function selectField(page, size, reqData) {
 // 查询地块
 export function selectFieldDetail(id) {
   return get(`/field/getInfo/${id}`)
+}
+// 查询地块
+export function selectFieldTotal(areaId, treeTypeId) {
+  return get(`/field/totalSize`, { areaId, treeTypeId })
 }

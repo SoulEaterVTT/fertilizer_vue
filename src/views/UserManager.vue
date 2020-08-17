@@ -23,6 +23,12 @@
 
         <el-button type="primary" @click="getUserList" icon="el-icon-search">查询</el-button>
         <el-button type="primary" icon="el-icon-add" @click="handleCreate">添加</el-button>
+        <el-button
+          :loading="downloadLoading"
+          type="primary"
+          icon="el-icon-download"
+          @click="handleDownload"
+        >导出</el-button>
       </el-form>
     </div>
     <div class="table-contain3">
@@ -99,7 +105,7 @@
                 </el-form-item>
               </div>
               <div class="content-right">
-                <el-form-item label="区域">
+                <el-form-item prop="areaId" label="区域">
                   <el-select
                     v-model="temp.areaId"
                     style="width:100%"
@@ -198,7 +204,7 @@
         >
           <el-form
             ref="fieldForm"
-            :model="fieldEditTemp"
+            :model="fieldTemp"
             :rules="rules"
             label-position="right"
             label-width="100px"
@@ -206,7 +212,7 @@
           >
             <el-form-item prop="treeTypeId" label="品种">
               <el-select
-                v-model="fieldEditTemp.treeTypeId"
+                v-model="fieldTemp.treeTypeId"
                 class="headSelect"
                 clearable
                 placeholder="请选择品种"
@@ -219,19 +225,14 @@
                 />
               </el-select>
             </el-form-item>
-            <el-form-item prop="tdSize" label="亩数">
-              <el-input v-model="fieldEditTemp.tdSize" />
+            <el-form-item prop="size" label="亩数">
+              <el-input v-model="fieldTemp.size" />
             </el-form-item>
             <el-form-item prop="treeAge" label="种树时间">
-              <el-input v-model="fieldEditTemp.treeAge" />
+              <el-input v-model="fieldTemp.treeAge" />
             </el-form-item>
             <el-form-item label="备注">
-              <el-input
-                v-model="fieldEditTemp.tdRemark"
-                type="textarea"
-                :rows="5"
-                placeholder="请输入内容"
-              />
+              <el-input v-model="fieldTemp.remark" type="textarea" :rows="5" placeholder="请输入内容" />
             </el-form-item>
           </el-form>
           <span slot="footer" class="dialog-footer">
@@ -263,6 +264,7 @@ import {
   selectFieldDetail
 } from "@/api/fieldApi.js";
 import { selectTreeType } from "@/api/treeTypeApi.js";
+import { selectArea } from "@/api/areaApi.js";
 import moment from "moment";
 export default {
   filters: {
@@ -293,6 +295,7 @@ export default {
       add_icon_name: "add_no",
       active: "",
       show: false,
+      downloadLoading: false,
       tableData: [],
       parentData: [],
       varietyData: [],
@@ -324,32 +327,10 @@ export default {
         id: null,
         userId: null,
         size: null,
-        treeName: null,
         treeAge: null,
         treeTypeId: null,
-        remark: null,
-        createTime: null,
-        updateTime: null
+        remark: null
       },
-      fieldEditTemp: {
-        tdId: null,
-        tdRemark: null,
-        tdSize: null,
-        treeAge: null,
-        treeName: null,
-        userAddress: null,
-        userId: null,
-        userMobileNum: null,
-        userName: null,
-        treeTypeId: null
-      },
-
-// id: "bc3739b0-33e6-40b5-bb25-df095e878ac3"
-// remark: ""
-// size: "5"
-// treeAge: 2014
-// treeTypeId: "c2297b3a-a539-46cd-8fee-390854e9ab19"
-// userId: "00b12305-0472-48cf-ad05-37bce021b901"
 
       rules: {
         name: [
@@ -372,13 +353,19 @@ export default {
           }
         ],
         size: [{ required: true, message: "请输入亩数", trigger: "blur" }],
-        treeAge: [{ required: true, message: "请输入树龄", trigger: "blur" }]
+        treeAge: [{ required: true, message: "请输入树龄", trigger: "blur" }],
+        areaId: [{ required: true, message: "请选择区域", trigger: "change" }],
+        treeTypeId: [
+          { required: true, message: "请选择品种", trigger: "change" }
+        ]
       },
       reqTemp: {
         name: null,
         mobileNum: null,
         areaId: null
-      }
+      },
+      exportData: [],
+      excelName: null
     };
   },
   watch: {
@@ -435,6 +422,39 @@ export default {
         this.paginations.total = res.data.total;
         this.tableData = res.data.list;
       });
+    },
+    handleDownload() {
+      if (this.reqTemp.areaId == null) {
+        this.excelName = "所有";
+      } else {
+        selectArea(1, 1, { id: this.reqTemp.areaId }).then(res => {
+          this.excelName = res.data.list[0].location;
+        });
+      }
+
+      selectUser(1, 1000, this.reqTemp).then(res => {
+        this.exportData = res.data.list;
+        this.downloadLoading = true;
+        import("@/vendor/Export2Excel").then(excel => {
+          const tHeader = ["姓名", "手机号", "地址"];
+          const filterVal = ["name", "mobileNum", "address"];
+          const data = this.formatJson(filterVal);
+          excel.export_json_to_excel({
+            header: tHeader,
+            data,
+            filename: this.excelName + "用户表"
+          });
+          this.downloadLoading = false;
+          this.excelName = null;
+        });
+      });
+    },
+    formatJson(filterVal) {
+      return this.exportData.map(v =>
+        filterVal.map(j => {
+          return v[j];
+        })
+      );
     },
     // 每页多少条切换
     handleSizeChange(pageSize) {
@@ -523,15 +543,15 @@ export default {
     },
     handleCreateField() {
       this.fielDialogStatus = "create";
+      this.fieldTemp.userId = this.userId;
       this.isShowForm = true;
     },
     handleUpdateField(row) {
       selectFieldDetail(row.tdId).then(res => {
-        console.log(res);
+        this.fieldTemp = res.data;
       });
-      // this.fieldEditTemp = row;
-      // this.fielDialogStatus = "update";
-      // this.isShowForm = true;
+      this.fielDialogStatus = "update";
+      this.isShowForm = true;
     },
     handleDeleteField(row) {
       this.$confirm("是否确定删除此地块?", "提示", {
@@ -556,14 +576,6 @@ export default {
     createFieldData() {
       this.$refs["fieldForm"].validate(valid => {
         if (valid) {
-          this.fieldTemp = {
-            id: this.fieldEditTemp.tdId,
-            userId: this.userId,
-            size: this.fieldEditTemp.tdSize,
-            treeAge: this.fieldEditTemp.treeAge,
-            treeTypeId: this.fieldEditTemp.treeTypeId,
-            remark: this.fieldEditTemp.tdRemark
-          };
           addField(this.fieldTemp).then(() => {
             this.getFieldList();
             this.closeDialog();
@@ -574,14 +586,6 @@ export default {
     updateFieldData() {
       this.$refs["fieldForm"].validate(valid => {
         if (valid) {
-          this.fieldTemp = {
-            id: this.fieldEditTemp.tdId,
-            userId: this.userId,
-            size: this.fieldEditTemp.tdSize,
-            treeAge: this.fieldEditTemp.treeAge,
-            treeTypeId: this.fieldEditTemp.treeTypeId,
-            remark: this.fieldEditTemp.tdRemark
-          };
           updateField(this.fieldTemp).then(() => {
             this.getFieldList();
             this.closeDialog();
@@ -600,20 +604,8 @@ export default {
         userId: null,
         size: null,
         treeAge: null,
-        remark: null,
-        createTime: null,
-        updateTime: null
-      };
-      this.fieldEditTemp = {
-        tdId: null,
-        tdRemark: null,
-        tdSize: null,
-        treeAge: null,
-        treeName: null,
-        userAddress: null,
-        userId: null,
-        userMobileNum: null,
-        userName: null
+        treeTypeId: null,
+        remark: null
       };
     }
   }

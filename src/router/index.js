@@ -41,6 +41,15 @@ export const constantRouterMap = [
         }
       },
       {
+        path: '/Price',
+        component: () => import('@/views/SpecialPriceManager'),
+        name: 'Price',
+        meta: {
+          title: '价格管理',
+          icon: 'user',
+        }
+      },
+      {
         path: '/Soil',
         component: () => import('@/views/SoilManager'),
         name: 'Soil',
@@ -75,7 +84,17 @@ export const constantRouterMap = [
           title: '地块管理',
           icon: 'user',
         }
+      },
+      {
+        path: '/Sale',
+        component: () => import('@/views/SaleManager'),
+        name: 'Sale',
+        meta: {
+          title: '订单管理',
+          icon: 'user',
+        }
       }
+
     ]
   }
 ]

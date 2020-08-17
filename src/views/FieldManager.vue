@@ -2,22 +2,29 @@
   <div class="manager-contain">
     <div class="head">
       <el-form :inline="true" :model="reqTemp">
-        <span class="query-name">名称：</span>
-        <el-select
-          v-model="reqTemp.parentId"
-          class="headSelect"
-          clearable
-          placeholder="请选择肥料"
-          @change="setParentValue"
-        >
-          <el-option v-for="item in parentData" :key="item.id" :label="item.name" :value="item.id" />
+        <span class="query-name">区域：</span>
+        <el-select v-model="reqTemp.areaId" class="headSelect" clearable placeholder="请选择区域">
+          <el-option
+            v-for="item in parentData"
+            :key="item.id"
+            :label="item.location"
+            :value="item.id"
+          />
         </el-select>
-
-        <el-button type="primary" @click="getUserList" icon="el-icon-search">查询</el-button>
-        <el-button type="primary" icon="el-icon-add" @click="handleCreate">添加</el-button>
+        <span class="query-name">品种：</span>
+        <el-select v-model="reqTemp.treeTypeId" class="headSelect" clearable placeholder="请选择品种">
+          <el-option
+            v-for="item in varietyData"
+            :key="item.id"
+            :label="item.treeName"
+            :value="item.id"
+          />
+        </el-select>
+        <el-button type="primary" @click="getFieldList" icon="el-icon-search" class="headSelect">查询</el-button>
+        <span class="query-name">总亩数：{{totalsize}} 亩</span>
       </el-form>
     </div>
-    <div class="form-content2" :style="active" @mouseover="mouseOver" @mouseleave="mouseLeave">
+    <div class="table-contain3">
       <el-table
         :data="fieldData"
         border
@@ -31,106 +38,71 @@
         <el-table-column property="tdSize" label="亩数" align="center" />
         <el-table-column property="treeAge" label="树龄" align="center" />
         <el-table-column property="tdRemark" label="备注" align="center" />
-
-        <el-table-column label="操作" align="center">
-          <template slot-scope="scope">
-            <div>
-              <svg-icon
-                style="color:#bfcbd9"
-                icon-class="edit"
-                @click="handleUpdateField(scope.row)"
-              />
-              <svg-icon
-                style="color:#bfcbd9"
-                icon-class="delete"
-                @click="handleDeleteField(scope.row)"
-              />
-            </div>
-          </template>
-        </el-table-column>
+        <el-table-column property="userName" label="姓名" align="center" />
+        <el-table-column property="userMobileNum" label="手机号" align="center" />
+        <el-table-column property="userAddress" label="地址" align="center" />
       </el-table>
+      <el-row class="elrow-class">
+        <el-col :span="24">
+          <div class="pagination">
+            <el-pagination
+              v-if="paginations.total > 0"
+              background
+              :page-sizes="paginations.pageSizes"
+              :page-size="paginations.pageSize"
+              :layout="paginations.layout"
+              :total="paginations.total"
+              @current-change="handleCurrentChange"
+              @size-change="handleSizeChange"
+            />
+          </div>
+        </el-col>
+      </el-row>
     </div>
   </div>
 </template>
 
 <script>
-import {
-  addField,
-  selectField,
-  deleteFieldById,
-  updateField
-} from "@/api/fieldApi.js";
-import { selectUser } from "@/api/userApi.js";
+import { getAreaList } from "@/api/userApi.js";
+import { selectField, selectFieldTotal } from "@/api/fieldApi.js";
+import { selectTreeType } from "@/api/treeTypeApi.js";
+import moment from "moment";
 export default {
+  filters: {
+    formatDate: function(value) {
+      return moment(parseInt(value)).format("YYYY-MM-DD h:mm:ss");
+    }
+  },
   data() {
-    var checkPhone = (rule, value, callback) => {
-      const phoneReg = /^1[3|4|5|7|8|9][0-9]{9}$/;
-      if (!value) {
-        return callback(new Error("电话号码不能为空"));
-      }
-      setTimeout(() => {
-        if (!Number.isInteger(+value)) {
-          callback(new Error("请输入数字值"));
-        } else {
-          if (phoneReg.test(value)) {
-            callback();
-          } else {
-            callback(new Error("电话号码格式不正确"));
-          }
-        }
-      }, 100);
-    };
     return {
       add_icon_name: "add_no",
       active: "",
       show: false,
-      tableData: [],
-      userData: [],
-      // 需要给分页组件传的信息
+      totalsize: null,
+      parentData: [],
+      varietyData: [],
+      fieldData: [],
+      userId: null,
       paginations: {
-        total: 0, // 总数
-        pageIndex: 1, // 当前位于哪页
-        pageSize: 15, // 1页显示多少条
-        pageSizes: [15, 20], // 每页显示多少条
-        layout: "total, sizes, prev, pager, next, jumper" // 翻页属性
+        total: 0,
+        pageIndex: 1,
+        pageSize: 14,
+        pageSizes: [14, 20],
+        layout: "total, sizes, prev, pager, next, jumper"
       },
-      dialogFormVisible: false,
-      dialogStatus: "",
-      temp: {
+
+      fieldTemp: {
         id: null,
-        name: null,
-        mobileNum: null,
-        address: null,
-        password: null,
-        parentId: null,
-        createTime: null,
-        updateTime: null
+        userId: null,
+        size: null,
+        treeAge: null,
+        treeTypeId: null,
+        remark: null
       },
+
       reqTemp: {
-        name: null,
-        mobileNum: null,
-        parentId: null
-      },
-      rules: {
-        name: [
-          { required: true, message: "请输入用户名", trigger: "blur" },
-          {
-            min: 2,
-            max: 50,
-            message: "长度在 2 到 50 个字符",
-            trigger: "blur"
-          }
-        ],
-        mobileNum: [{ required: true, validator: checkPhone, trigger: "blur" }],
-        address: [
-          { required: true, message: "请输入地址", trigger: "blur" },
-          {
-            min: 2,
-            max: 50,
-            message: "长度在 5 到 50 个字符",
-            trigger: "blur"
-          }
-        ]
+        treeTypeId: null,
+        areaId: null
       }
     };
   },
@@ -145,25 +117,27 @@ export default {
   },
   created() {},
   mounted() {
-    selectUser().then(res => {
-      this.userData = res.data;
+    selectTreeType(1, 500, {}).then(res => {
+      this.varietyData = res.data.list;
     });
+    getAreaList().then(res => {
+      this.parentData = res.data;
+    });
+
     this.getFieldList();
   },
   methods: {
-    setAccessValue(event) {
-      this.temp.access = event;
-    },
-    setDomainValue(event) {
-      this.temp.domain = event;
-    },
     handleMouseEnter: function(row, column, cell, event) {
-      cell.children[0].children[0].children[0].style.color = "#64d9d6";
+      cell.children[0].children[0].children[0].style.color = "#70cdf1";
       cell.children[0].children[0].children[1].style.color = "#f56c6c";
+      cell.children[0].children[0].children[2].style.color = "#42b983";
+      cell.children[0].children[0].children[3].style.color = "#64d9d6";
     },
     handleMouseOut: function(row, column, cell, event) {
       cell.children[0].children[0].children[0].style.color = "#bfcbd9";
       cell.children[0].children[0].children[1].style.color = "#bfcbd9";
+      cell.children[0].children[0].children[2].style.color = "#bfcbd9";
+      cell.children[0].children[0].children[3].style.color = "#bfcbd9";
     },
     handleAddMouseOver() {
       this.add_icon_name = "add_yes";
@@ -178,16 +152,6 @@ export default {
     mouseLeave() {
       this.active = "";
     },
-    getFieldList() {
-      selectField(
-        this.paginations.pageIndex,
-        this.paginations.pageSize,
-        {}
-      ).then(res => {
-        this.paginations.total = res.data.total;
-        this.tableData = res.data.list;
-      });
-    },
     // 每页多少条切换
     handleSizeChange(pageSize) {
       this.paginations.pageSize = pageSize;
@@ -198,88 +162,20 @@ export default {
       this.paginations.pageIndex = page;
       this.getFieldList();
     },
-    handleDelete(row) {
-      this.$confirm("是否确定删除此地块?", "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消"
-      })
-        .then(() => {
-          deleteFieldById(row.id).then(() => {
-            this.$message({
-              message: "删除成功",
-              type: "success"
-            });
-            this.getFieldList();
-          });
-        })
-        .catch(() => {
-          this.$message({
-            message: "已取消删除"
-          });
-        });
-    },
-    handleEdit(row) {
-      this.temp = row;
-      this.dialogStatus = "update";
-      this.dialogFormVisible = true;
-      this.$nextTick(() => {
-        this.$refs["dataForm"].clearValidate();
+    getFieldList() {
+      selectField(
+        this.paginations.pageIndex,
+        this.paginations.pageSize,
+        this.reqTemp
+      ).then(res => {
+        this.paginations.total = res.data.total;
+        this.fieldData = res.data.list;
       });
-    },
-    resetTemp() {
-      this.temp = {
-        id: null,
-        name: null,
-        mobileNum: null,
-        address: null,
-        password: null,
-        parentId: null,
-        createTime: null,
-        updateTime: null
-      };
-    },
-
-    handleCreate() {
-      this.resetTemp();
-      this.dialogStatus = "create";
-      this.dialogFormVisible = true;
-      this.$nextTick(() => {
-        this.$refs["dataForm"].clearValidate();
-      });
-    },
-    createData() {
-      this.$refs["dataForm"].validate(valid => {
-        if (valid) {
-          addField(this.temp).then(() => {
-            this.dialogFormVisible = false;
-            this.getFieldList();
-          });
+      selectFieldTotal(this.reqTemp.areaId, this.reqTemp.treeTypeId).then(
+        res => {
+          this.totalsize = res.data;
         }
-      });
-    },
-    updateData() {
-      this.$refs["dataForm"].validate(valid => {
-        if (valid) {
-          updateField(this.temp).then(() => {
-            this.dialogFormVisible = false;
-            this.getFieldList();
-          });
-        }
-      });
-    },
-    setParentValue(event) {
-      this.temp.parentId = event;
-    },
-    click() {
-      this.show = !this.show;
-      if (this.show) {
-        this.$refs.headerSearchSelect && this.$refs.headerSearchSelect.focus();
-      }
-    },
-    close() {
-      this.$refs.headerSearchSelect && this.$refs.headerSearchSelect.blur();
-      this.options = [];
-      this.show = false;
+      );
     }
   }
 };
