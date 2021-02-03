@@ -34,11 +34,6 @@
         @cell-mouse-leave="handleMouseOut"
       >
         <el-table-column property="treeName" label="名称" align="center" />
-        <el-table-column property="myTime" label="萌芽期" align="center" />
-        <el-table-column property="khTime" label="开花期" align="center" />
-        <el-table-column property="zgTime" label="坐果期" align="center" />
-        <el-table-column property="chpgTime" label="促花膨果期" align="center" />
-        <el-table-column property="zsTime" label="着色期" align="center" />
         <el-table-column property="remark" label="备注" align="center" />
 
         <el-table-column label="操作" align="center">
@@ -95,7 +90,7 @@
                 <el-form-item prop="treeName" label="名称">
                   <el-input v-model="temp.treeName" placeholder="请输入名称" />
                 </el-form-item>
-                <el-form-item prop="myTime" label="萌芽期">
+                <!-- <el-form-item prop="myTime" label="萌芽期">
                   <el-input v-model="temp.myTime" placeholder="请输入注意事项" />
                 </el-form-item>
                 <el-form-item prop="khTime" label="开花期">
@@ -109,7 +104,7 @@
                 </el-form-item>
                 <el-form-item prop="zsTime" label="着色期">
                   <el-input v-model="temp.zsTime" placeholder="请输入注意事项" />
-                </el-form-item>
+                </el-form-item>-->
               </div>
               <div class="content-right">
                 <el-form-item prop="remark" label="备注">
@@ -189,7 +184,7 @@
                       :value="item.id"
                     />
                   </el-select>
-                </el-form-item> -->
+                </el-form-item>-->
               </div>
             </div>
           </el-form>
@@ -215,7 +210,7 @@ import {
   updateTreeType,
   selectTreeType
 } from "@/api/treeTypeApi.js";
-import { selectBch } from "@/api/bchApi.js";
+import { selectBch } from "@/api/bchDataApi.js";
 
 export default {
   data() {

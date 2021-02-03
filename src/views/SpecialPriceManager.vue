@@ -275,7 +275,7 @@ export default {
         if (valid) {
           addPrice(this.temp).then(() => {
             this.dialogFormVisible = false;
-            this.getSpecialPriceList();
+            this.getSpecialPriceList(); 
           });
         }
       });

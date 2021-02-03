@@ -23,6 +23,15 @@ export const constantRouterMap = [
         }
       },
       {
+        path: '/Field',
+        component: () => import('@/views/FieldManager'),
+        name: 'Field',
+        meta: {
+          title: '地块管理',
+          icon: 'user',
+        }
+      },
+      {
         path: '/Variety',
         component: () => import('@/views/VarietyManager'),
         name: 'Variety',
@@ -31,6 +40,25 @@ export const constantRouterMap = [
           icon: 'user',
         }
       },
+      {
+        path: '/PestData',
+        component: () => import('@/views/PestData'),
+        name: 'PestData',
+        meta: {
+          title: '病虫害数据',
+          icon: 'user',
+        }
+      },
+      {
+        path: '/Pest',
+        component: () => import('@/views/PestManager'),
+        name: 'Pest',
+        meta: {
+          title: '病虫害管理',
+          icon: 'user',
+        }
+      },
+
       {
         path: '/Fertilizer',
         component: () => import('@/views/FertilizerManager'),
@@ -50,20 +78,11 @@ export const constantRouterMap = [
         }
       },
       {
-        path: '/Soil',
-        component: () => import('@/views/SoilManager'),
-        name: 'Soil',
+        path: '/Sale',
+        component: () => import('@/views/SaleManager'),
+        name: 'Sale',
         meta: {
-          title: '土壤管理',
-          icon: 'user',
-        }
-      },
-      {
-        path: '/Pest',
-        component: () => import('@/views/PestManager'),
-        name: 'Pest',
-        meta: {
-          title: '病虫害管理',
+          title: '订单管理',
           icon: 'user',
         }
       },
@@ -77,24 +96,14 @@ export const constantRouterMap = [
         }
       },
       {
-        path: '/Field',
-        component: () => import('@/views/FieldManager'),
-        name: 'Field',
+        path: '/Soil',
+        component: () => import('@/views/SoilManager'),
+        name: 'Soil',
         meta: {
-          title: '地块管理',
+          title: '土壤管理',
           icon: 'user',
         }
       },
-      {
-        path: '/Sale',
-        component: () => import('@/views/SaleManager'),
-        name: 'Sale',
-        meta: {
-          title: '订单管理',
-          icon: 'user',
-        }
-      }
-
     ]
   }
 ]

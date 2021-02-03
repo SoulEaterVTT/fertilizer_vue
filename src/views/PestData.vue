@@ -2,27 +2,20 @@
   <div class="manager-contain">
     <div class="head">
       <el-form :inline="true" :model="reqTemp">
-        <span class="query-name">品种：</span>
+        <span class="query-name">名称：</span>
         <el-select
           v-model="reqTemp.id"
           class="headSelect"
           clearable
-          placeholder="请选择品种"
-          @change="setParentValue"
+          placeholder="请选择病虫害名称"
+          @change="setBchValue"
         >
-          <el-option
-            v-for="item in varietyData"
-            :key="item.id"
-            :label="item.treeName"
-            :value="item.id"
-          />
+          <el-option v-for="item in bchData" :key="item.id" :label="item.name" :value="item.id" />
         </el-select>
-
-        <el-button type="primary" @click="getVarietyList" icon="el-icon-search">查询</el-button>
+        <el-button type="primary" @click="getBchList" icon="el-icon-search">查询</el-button>
         <el-button type="primary" icon="el-icon-add" @click="handleCreate">添加</el-button>
       </el-form>
     </div>
-
     <div class="table-contain3">
       <el-table
         :data="tableData"
@@ -33,13 +26,11 @@
         @cell-mouse-enter="handleMouseEnter"
         @cell-mouse-leave="handleMouseOut"
       >
-        <el-table-column property="treeName" label="名称" align="center" />
+        <el-table-column property="name" label="名称" align="center" />
+        <el-table-column property="wbmsRemark" label="文字描述" align="center" />
+        <el-table-column property="fileRemark" label="图片描述" align="center" />
+        <el-table-column property="prevention" label="防治" align="center" />
         <el-table-column property="remark" label="备注" align="center" />
-        <el-table-column property="remark" label="萌芽期" align="center" />
-        <el-table-column property="remark" label="开花期" align="center" />
-        <el-table-column property="remark" label="坐果期" align="center" />
-        <el-table-column property="remark" label="促花膨果期" align="center" />
-        <el-table-column property="remark" label="着色期" align="center" />
 
         <el-table-column label="操作" align="center">
           <template slot-scope="scope">
@@ -92,103 +83,22 @@
           >
             <div class="content">
               <div class="content-left">
-                <el-form-item prop="treeName" label="名称">
-                  <el-input v-model="temp.treeName" placeholder="请输入名称" />
+                <el-form-item prop="name" label="名称">
+                  <el-input v-model="temp.name" placeholder="请输入名称" />
                 </el-form-item>
-                <el-form-item prop="myTime" label="萌芽期">
-                  <el-input v-model="temp.myTime" placeholder="请输入注意事项" />
+                <el-form-item label="文字描述">
+                  <el-input v-model="temp.wbmsRemark" placeholder="请输入文字描述" />
                 </el-form-item>
-                <el-form-item prop="khTime" label="开花期">
-                  <el-input v-model="temp.khTime" placeholder="请输入注意事项" />
-                </el-form-item>
-                <el-form-item prop="zgTime" label="坐果期">
-                  <el-input v-model="temp.zgTime" placeholder="请输入注意事项" />
-                </el-form-item>
-                <el-form-item prop="chpgTime" label="促花膨果期">
-                  <el-input v-model="temp.chpgTime" placeholder="请输入注意事项" />
-                </el-form-item>
-                <el-form-item prop="zsTime" label="着色期">
-                  <el-input v-model="temp.zsTime" placeholder="请输入注意事项" />
+                <el-form-item label="防治">
+                  <el-input v-model="temp.prevention" placeholder="请输入如何防治" />
                 </el-form-item>
               </div>
               <div class="content-right">
-                <el-form-item prop="remark" label="备注">
+                <el-form-item label="图片描述">
+                  <el-input v-model="temp.fileRemark" placeholder="请输入图片描述" />
+                </el-form-item>
+                <el-form-item label="备注">
                   <el-input v-model="temp.remark" placeholder="请输入备注" />
-                </el-form-item>
-                <el-form-item label="病虫害">
-                  <el-select
-                    v-model="temp.myBch"
-                    style="width:100%"
-                    multiple
-                    placeholder="请选择病虫害"
-                  >
-                    <el-option
-                      v-for="item in bchData"
-                      :key="item.id"
-                      :label="item.name"
-                      :value="item.id"
-                    />
-                  </el-select>
-                </el-form-item>
-                <el-form-item label="病虫害">
-                  <el-select
-                    v-model="temp.khBch"
-                    style="width:100%"
-                    multiple
-                    placeholder="请选择病虫害"
-                  >
-                    <el-option
-                      v-for="item in bchData"
-                      :key="item.id"
-                      :label="item.name"
-                      :value="item.id"
-                    />
-                  </el-select>
-                </el-form-item>
-                <el-form-item label="病虫害">
-                  <el-select
-                    v-model="temp.zgBch"
-                    style="width:100%"
-                    multiple
-                    placeholder="请选择病虫害"
-                  >
-                    <el-option
-                      v-for="item in bchData"
-                      :key="item.id"
-                      :label="item.name"
-                      :value="item.id"
-                    />
-                  </el-select>
-                </el-form-item>
-                <el-form-item label="病虫害">
-                  <el-select
-                    v-model="temp.chpgBch"
-                    style="width:100%"
-                    multiple
-                    placeholder="请选择病虫害"
-                  >
-                    <el-option
-                      v-for="item in bchData"
-                      :key="item.id"
-                      :label="item.name"
-                      :value="item.id"
-                    />
-                  </el-select>
-                </el-form-item>
-                <el-form-item label="病虫害">
-                  <el-select
-                    v-model="temp.zsBch"
-                    style="width:100%"
-                    multiple
-                    placeholder="请选择病虫害"
-                  >
-                    <el-option
-                      v-for="item in bchData"
-                      :key="item.id"
-                      :label="item.name"
-                      :value="item.id"
-                    />
-                  </el-select>
                 </el-form-item>
               </div>
             </div>
@@ -210,13 +120,11 @@
 
 <script>
 import {
-  addTreeType,
-  deleteTreeTypeById,
-  updateTreeType,
-  selectTreeType
-} from "@/api/treeTypeApi.js";
-import { selectBch } from "@/api/bchDataApi.js";
-
+  addBch,
+  updateBch,
+  deleteBchById,
+  selectBch
+} from "@/api/bchDataApi.js";
 export default {
   data() {
     return {
@@ -224,31 +132,23 @@ export default {
       active: "",
       show: false,
       tableData: [],
-      varietyData: [],
       bchData: [],
       paginations: {
         total: 0,
         pageIndex: 1,
-        pageSize: 15,
-        pageSizes: [15, 20],
+        pageSize: 10,
+        pageSizes: [10, 20],
         layout: "total, sizes, prev, pager, next, jumper"
       },
       dialogFormVisible: false,
       dialogStatus: "",
       temp: {
         id: null,
-        treeName: null,
+        name: null,
+        wbmsRemark: null,
+        fileRemark: null,
         remark: null,
-        myTime: null,
-        khTime: null,
-        zgTime: null,
-        chpgTime: null,
-        zsTime: null,
-        myBch: null,
-        khBch: null,
-        zgBch: null,
-        chpgBch: null,
-        zsBch: null,
+        prevention: null,
         createTime: null,
         updateTime: null
       },
@@ -256,8 +156,26 @@ export default {
         id: null
       },
       rules: {
-        treeName: [
-          { required: true, message: "请输入品种名称", trigger: "blur" },
+        name: [
+          { required: true, message: "请输入名称", trigger: "blur" },
+          {
+            min: 2,
+            max: 50,
+            message: "长度在 2 到 50 个字符",
+            trigger: "blur"
+          }
+        ],
+        fileRemark: [
+          { required: true, message: "请输入图片描述", trigger: "blur" },
+          {
+            min: 2,
+            max: 50,
+            message: "长度在 2 到 50 个字符",
+            trigger: "blur"
+          }
+        ],
+        remark: [
+          { required: true, message: "请输入备注", trigger: "blur" },
           {
             min: 2,
             max: 50,
@@ -279,11 +197,7 @@ export default {
   },
   created() {},
   mounted() {
-    selectBch(1, 500, {}).then(res => {
-      this.bchData = res.data.list;
-    });
-
-    this.getVarietyList();
+    this.getBchList();
   },
   methods: {
     setAccessValue(event) {
@@ -313,8 +227,8 @@ export default {
     mouseLeave() {
       this.active = "";
     },
-    getVarietyList() {
-      selectTreeType(
+    getBchList() {
+      selectBch(
         this.paginations.pageIndex,
         this.paginations.pageSize,
         this.reqTemp
@@ -322,32 +236,32 @@ export default {
         this.paginations.total = res.data.total;
         this.tableData = res.data.list;
       });
-      selectTreeType(1, 500, {}).then(res => {
-        this.varietyData = res.data.list;
+      selectBch(1, 500, {}).then(res => {
+        this.bchData = res.data.list;
       });
     },
     // 每页多少条切换
     handleSizeChange(pageSize) {
       this.paginations.pageSize = pageSize;
-      this.getVarietyList();
+      this.getBchList();
     },
     // 上下分页
     handleCurrentChange(page) {
       this.paginations.pageIndex = page;
-      this.getVarietyList();
+      this.getBchList();
     },
     handleDelete(row) {
-      this.$confirm("是否确定删除此品种?", "提示", {
+      this.$confirm("是否确定删除此病虫害?", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消"
       })
         .then(() => {
-          deleteTreeTypeById(row.id).then(() => {
+          deleteBchById(row.id).then(() => {
             this.$message({
               message: "删除成功",
               type: "success"
             });
-            this.getVarietyList();
+            this.getBchList();
           });
         })
         .catch(() => {
@@ -367,18 +281,11 @@ export default {
     resetTemp() {
       this.temp = {
         id: null,
-        treeName: null,
+        name: null,
+        wbmsRemark: null,
+        fileRemark: null,
         remark: null,
-        myTime: null,
-        khTime: null,
-        zgTime: null,
-        chpgTime: null,
-        zsTime: null,
-        myBch: null,
-        khBch: null,
-        zgBch: null,
-        chpgBch: null,
-        zsBch: null,
+        prevention: null,
         createTime: null,
         updateTime: null
       };
@@ -395,14 +302,9 @@ export default {
     createData() {
       this.$refs["dataForm"].validate(valid => {
         if (valid) {
-          // this.temp.myBch = this.temp.myBch.join();
-          // this.temp.khBch = this.temp.khBch.join();
-          // this.temp.zgBch = this.temp.zgBch.join();
-          // this.temp.chpgBch = this.temp.chpgBch.join();
-          // this.temp.zsBch = this.temp.zsBch.join();
-          addTreeType(this.temp).then(() => {
+          addBch(this.temp).then(() => {
             this.dialogFormVisible = false;
-            this.getVarietyList();
+            this.getBchList();
           });
         }
       });
@@ -410,20 +312,15 @@ export default {
     updateData() {
       this.$refs["dataForm"].validate(valid => {
         if (valid) {
-          this.temp.myBch = this.temp.myBch.join();
-          this.temp.khBch = this.temp.khBch.join();
-          this.temp.zgBch = this.temp.zgBch.join();
-          this.temp.chpgBch = this.temp.chpgBch.join();
-          this.temp.zsBch = this.temp.zsBch.join();
-          updateTreeType(this.temp).then(() => {
+          updateBch(this.temp).then(() => {
             this.dialogFormVisible = false;
-            this.getVarietyList();
+            this.getBchList();
           });
         }
       });
     },
-    setParentValue(event) {
-      this.temp.parentId = event;
+    setBchValue(event) {
+      this.temp.id = event;
     },
     click() {
       this.show = !this.show;

@@ -22,6 +22,7 @@
         </el-select>
         <el-button type="primary" @click="getSaleList" icon="el-icon-search">查询</el-button>
         <el-button type="primary" icon="el-icon-add" @click="handleCreate">添加</el-button>
+        <el-button type="primary" icon="el-icon-add" @click="handleDetail">详情</el-button>
       </el-form>
     </div>
     <div class="table-contain3">
@@ -121,6 +122,47 @@
           </div>
         </div>
       </el-drawer>
+
+      <el-drawer
+        ref="drawer"
+        :visible.sync="dialogDetailVisible"
+        direction="rtl"
+        :modal="false"
+        :show-close="false"
+        size="100%"
+        class="form-container2"
+      >
+        <div class="form-content" :style="active" @mouseover="mouseOver" @mouseleave="mouseLeave">
+          <el-table
+            :data="detailData"
+            border
+            stripe
+            height="730"
+            style="width:100%"
+            @cell-mouse-enter="handleMouseEnter"
+            @cell-mouse-leave="handleMouseOut"
+          >
+            <el-table-column property="location" label="区域名称" align="center" />
+            <el-table-column property="dhfTotal" label="大化肥" align="center" />
+            <el-table-column property="dhfNum" label="数量" align="center" />
+            <el-table-column property="jfTotal" label="菌肥" align="center" />
+            <el-table-column property="jfNum" label="数量" align="center" />
+            <el-table-column property="gjfTotal" label="高钾肥" align="center" />
+            <el-table-column property="gjfNum" label="数量" align="center" />
+            <el-table-column property="phfTotal" label="平衡肥" align="center" />
+            <el-table-column property="phfNum" label="数量" align="center" />
+            <el-table-column property="xtdTotal" label="小糖豆" align="center" />
+            <el-table-column property="xtdNum" label="数量" align="center" />
+            <el-table-column property="wxymTotal" label="叶面肥" align="center" />
+            <el-table-column property="wxymNum" label="数量" align="center" />
+            <el-table-column property="qntTotal" label="拳能肽" align="center" />
+            <el-table-column property="qntNum" label="数量" align="center" />
+          </el-table>
+          <div slot="footer" class="form-footer">
+            <el-button class="cancle-btn" @click="dialogDetailVisible = false">返回</el-button>
+          </div>
+        </div>
+      </el-drawer>
     </div>
   </div>
 </template>
@@ -129,7 +171,7 @@
 import { selectFl } from "@/api/flApi.js";
 import { getAreaList } from "@/api/userApi.js";
 import { selectTreeType } from "@/api/treeTypeApi.js";
-import { addSale, selectSale } from "@/api/saleApi.js";
+import { addSale, selectSale, selectSaleDetail } from "@/api/saleApi.js";
 import moment from "moment";
 export default {
   filters: {
@@ -145,15 +187,17 @@ export default {
       tableData: [],
       fertilizerData: [],
       parentData: [],
+      detailData: [],
       varietyData: [],
       paginations: {
         total: 0,
         pageIndex: 1,
-        pageSize: 14,
-        pageSizes: [14, 20],
+        pageSize: 13,
+        pageSizes: [13, 20],
         layout: "total, sizes, prev, pager, next, jumper"
       },
       dialogFormVisible: false,
+      dialogDetailVisible: false,
       dialogStatus: "",
       temp: {
         id: null,
@@ -253,6 +297,12 @@ export default {
       this.resetTemp();
       this.dialogStatus = "create";
       this.dialogFormVisible = true;
+    },
+    handleDetail() {
+      selectSaleDetail(1, 100, {}).then(res => {
+        this.detailData = res.data.list;
+        this.dialogDetailVisible = true;
+      });
     },
     handleEdit(row) {
       this.temp = row;

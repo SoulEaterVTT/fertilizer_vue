@@ -20,7 +20,13 @@
             :value="item.id"
           />
         </el-select>
-        <el-button type="primary" @click="getFieldList" icon="el-icon-search" class="headSelect">查询</el-button>
+        <el-button type="primary" @click="getFieldList" icon="el-icon-search">查询</el-button>
+        <el-button
+          :loading="downloadLoading"
+          type="primary"
+          icon="el-icon-download"
+          @click="handleDownload"
+        >导出</el-button>
         <span class="query-name">总亩数：{{totalsize}} 亩</span>
       </el-form>
     </div>
@@ -34,13 +40,13 @@
         @cell-mouse-enter="handleMouseEnter"
         @cell-mouse-leave="handleMouseOut"
       >
+        <el-table-column property="userName" label="姓名" align="center" />
+        <el-table-column property="userMobileNum" label="手机号" align="center" />
+        <el-table-column property="userAddress" label="地址" align="center" />
         <el-table-column property="treeName" label="品种" align="center" />
         <el-table-column property="tdSize" label="亩数" align="center" />
         <el-table-column property="treeAge" label="树龄" align="center" />
         <el-table-column property="tdRemark" label="备注" align="center" />
-        <el-table-column property="userName" label="姓名" align="center" />
-        <el-table-column property="userMobileNum" label="手机号" align="center" />
-        <el-table-column property="userAddress" label="地址" align="center" />
       </el-table>
       <el-row class="elrow-class">
         <el-col :span="24">
@@ -65,6 +71,7 @@
 <script>
 import { getAreaList } from "@/api/userApi.js";
 import { selectField, selectFieldTotal } from "@/api/fieldApi.js";
+import { selectArea } from "@/api/areaApi.js";
 import { selectTreeType } from "@/api/treeTypeApi.js";
 import moment from "moment";
 export default {
@@ -103,7 +110,10 @@ export default {
       reqTemp: {
         treeTypeId: null,
         areaId: null
-      }
+      },
+      downloadLoading: false,
+      exportData: [],
+      excelName: null
     };
   },
   watch: {
@@ -175,6 +185,46 @@ export default {
         res => {
           this.totalsize = res.data;
         }
+      );
+    },
+    handleDownload() {
+      if (this.reqTemp.areaId == null) {
+        this.excelName = "所有";
+      } else {
+        selectArea(1, 1, { id: this.reqTemp.areaId }).then(res => {
+          this.excelName = res.data.list[0].location;
+        });
+      }
+
+      selectField(1, 1000, this.reqTemp).then(res => {
+        this.exportData = res.data.list;
+        this.downloadLoading = true;
+        import("@/vendor/Export2Excel").then(excel => {
+          const tHeader = ["姓名", "手机号", "地址", "品种", "亩数", "树龄","大化肥","菌肥"];
+          const filterVal = [
+            "userName",
+            "userMobileNum",
+            "userAddress",
+            "treeName",
+            "tdSize",
+            "treeAge"
+          ];
+          const data = this.formatJson(filterVal);
+          excel.export_json_to_excel({
+            header: tHeader,
+            data,
+            filename: this.excelName + "用户信息表"
+          });
+          this.downloadLoading = false;
+          this.excelName = null;
+        });
+      });
+    },
+    formatJson(filterVal) {
+      return this.exportData.map(v =>
+        filterVal.map(j => {
+          return v[j];
+        })
       );
     }
   }

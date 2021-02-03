@@ -44,6 +44,7 @@
         <el-table-column property="name" label="姓名" align="center" />
         <el-table-column property="mobileNum" label="手机号" align="center" />
         <el-table-column property="address" label="地址" align="center" />
+        <el-table-column property="remark" label="备注" align="center" />
 
         <el-table-column label="操作" align="center">
           <template slot-scope="scope">
@@ -102,6 +103,9 @@
                 </el-form-item>
                 <el-form-item prop="mobileNum" label="手机号">
                   <el-input v-model="temp.mobileNum" placeholder="请输入手机号" />
+                </el-form-item>
+                <el-form-item label="备注">
+                  <el-input v-model="temp.remark" placeholder="请输入备注" />
                 </el-form-item>
               </div>
               <div class="content-right">
@@ -321,7 +325,8 @@ export default {
         password: null,
         areaId: null,
         createTime: null,
-        updateTime: null
+        updateTime: null,
+        remark: null
       },
       fieldTemp: {
         id: null,
@@ -436,8 +441,8 @@ export default {
         this.exportData = res.data.list;
         this.downloadLoading = true;
         import("@/vendor/Export2Excel").then(excel => {
-          const tHeader = ["姓名", "手机号", "地址"];
-          const filterVal = ["name", "mobileNum", "address"];
+          const tHeader = ["姓名", "手机号", "地址", "备注"];
+          const filterVal = ["name", "mobileNum", "address", "remark"];
           const data = this.formatJson(filterVal);
           excel.export_json_to_excel({
             header: tHeader,
@@ -505,7 +510,8 @@ export default {
         password: null,
         areaId: null,
         createTime: null,
-        updateTime: null
+        updateTime: null,
+        remark: null
       };
     },
     handleCreate() {
